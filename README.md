@@ -226,13 +226,8 @@ sudo ufw allow 31314/tcp
 
 ---
 
-## 6. Install & Run Operator
-**Choose one Installation Method:**
-* Method 1: [Install using Docker](https://github.com/0xmoei/Drosera-Network/blob/main/README.md#method-1-docker)
-* Method 2: [Install using SystemD](https://github.com/0xmoei/Drosera-Network/blob/main/README.md#method-2-systemd)
-
 ## SystemD
-### 6-2-1: Configure SystemD service file
+### 6: Configure SystemD service file
 Enter this command in the terminal, But first replace:
 * `PV_KEY` with your `privatekey`
 * `VPS_IP` with your solid vps IP (without anything else)
