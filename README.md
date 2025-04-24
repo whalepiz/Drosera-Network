@@ -231,68 +231,7 @@ sudo ufw allow 31314/tcp
 * Method 1: [Install using Docker](https://github.com/0xmoei/Drosera-Network/blob/main/README.md#method-1-docker)
 * Method 2: [Install using SystemD](https://github.com/0xmoei/Drosera-Network/blob/main/README.md#method-2-systemd)
 
-## Method 1: Docker
-### 6-1-1: Configure Docker
-* Make sure you have installed `Docker` in Dependecies step.
-
-If you are currently running via old `systemd` method, stop it:
-```
-sudo systemctl stop drosera
-sudo systemctl disable drosera
-```
-```
-git clone https://github.com/0xmoei/Drosera-Network
-```
-```
-cd Drosera-Network
-```
-```
-cp .env.example .env
-```
-Edit `.env` file:
-```
-nano .env
-```
-* Replace `your_evm_private_key` and `your_vps_public_ip`
-* To save: `CTRL`+`X`, `Y` & `ENTER`.
-
-Edit `docker-compose.yaml` file:
-```bash
-nano docker-compose.yaml
-```
-* Replace default `rpc` to your private [Alchemy](https://dashboard.alchemy.com/) or [QuickNode](https://dashboard.quicknode.com/) Ethereum Holesky RPCs.
-* To save: `CTRL`+`X`, `Y` & `ENTER`.
-
-### 6-1-2: Run Operator
-```
-docker compose up -d
-```
-
-### 6-1-3: Check health
-```
-docker logs -f drosera-node
-```
-
-![image](https://github.com/user-attachments/assets/2ec4d181-ac60-4702-b4f4-9722ef275b50)
-
->  No problem if you are receiveing `WARN drosera_services::network::service: Failed to gossip message: InsufficientPeers`
-
-### 6-1-4: Optional Docker commands
-```console
-# Stop node
-cd Drosera-Network
-docker compose down -v
-
-# Restart node
-cd Drosera-Network
-docker compose up -d
-```
-
-**Now running your node using `Docker`, you can Jump to step 7.**
-
----
-
-## Method 2: SystemD
+## SystemD
 ### 6-2-1: Configure SystemD service file
 Enter this command in the terminal, But first replace:
 * `PV_KEY` with your `privatekey`
