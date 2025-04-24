@@ -9,8 +9,10 @@ In this Guide, we contribute to Drosera testnet by:
 * 2 CPU Cores
 * 4 GB RAM
 * 20 GB Disk Space
-* Get started with a low-budget `VPS` for as low as $5! [Purchase here](https://my.hostbrr.com/order/forms/a/NTMxNw==)
-* Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/) or [QuickNode](https://dashboard.quicknode.com/).
+* Get started with a low-budget `VPS` for as low as $5! [Purchase here](https://xorek.cloud/?from=27450)
+![image](https://github.com/user-attachments/assets/691efaf0-c589-45df-b2c0-62578e908a56)
+
+* Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
 
 ### Install Dependecies
 ```
