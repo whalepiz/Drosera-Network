@@ -19,7 +19,8 @@ Select "Change password" to change the password
 
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
 
-You can use PuTTY to log in to the VPS.
+* You can use PuTTY to log in to the VPS.
+
   ![image](https://github.com/user-attachments/assets/869a8124-b57d-4768-bc81-67dc44d6a8d9)
 
 ### Install Dependecies
