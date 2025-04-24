@@ -121,7 +121,7 @@ DROSERA_PRIVATE_KEY=xxx drosera apply
 ```bash
 DROSERA_PRIVATE_KEY=xxx drosera apply --eth-rpc-url RPC
 ```
-* Replace `RPC` with your own Ethereum Holesky rpc by registering and creating one in [Alchemy](https://dashboard.alchemy.com/) or [QuickNode](https://dashboard.quicknode.com/).
+* Replace `RPC` with your own Ethereum Holesky rpc by registering and creating one in [Alchemy](https://dashboard.alchemy.com/).
 
 ---
 
@@ -233,7 +233,7 @@ sudo ufw allow 31314/tcp
 Enter this command in the terminal, But first replace:
 * `PV_KEY` with your `privatekey`
 * `VPS_IP` with your solid vps IP (without anything else)
-* Replace default `https://ethereum-holesky-rpc.publicnode.com` to your private [Alchemy](https://dashboard.alchemy.com/) or [QuickNode](https://dashboard.quicknode.com/) Ethereum Holesky RPCs.
+* Replace default `https://ethereum-holesky-rpc.publicnode.com` to your private [Alchemy](https://dashboard.alchemy.com/) Ethereum Holesky RPCs.
 ```bash
 sudo tee /etc/systemd/system/drosera.service > /dev/null <<EOF
 [Unit]
