@@ -12,6 +12,11 @@ In this Guide, we contribute to Drosera testnet by:
 * Get started with a low-budget `VPS` for as low as $5! [Purchase here](https://xorek.cloud/?from=27450)
 ![image](https://github.com/user-attachments/assets/691efaf0-c589-45df-b2c0-62578e908a56)
 
+After purchasing, access the panel to change the VPS login password
+![image](https://github.com/user-attachments/assets/f691baf1-49e5-4246-a5f0-5729c2eef541)
+Select "Change password" to change the password
+![image](https://github.com/user-attachments/assets/faf2aacf-3562-446d-a075-61259a015fe5)
+
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
 
 ### Install Dependecies
