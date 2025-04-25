@@ -172,6 +172,8 @@ whitelist = ["Operator_Address"]
 * Replace `Operator_Address` with your EVM wallet `Public Address` between " " symbols
 * Your `Public Address` is your `Operator_Address`.
 
+## Wait 10 minutes and continue!
+
 **2- Update Trap Configuration:**
 ```bash
 DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
