@@ -119,7 +119,7 @@ forge build
 
 **Deploy Trap**:
 ```bash
-DROSERA_PRIVATE_KEY=XX drosera apply --eth-rpc-url RPC_YOU
+DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey` (Ensure it's funded with `Holesky ETH`)
 * Enter the command, when prompted, write `ofc` and press Enter.
@@ -161,7 +161,6 @@ drosera dryrun
 ## 1. Whitelist Your Operator
 **1- Edit Trap configuration:**
 ```bash
-cd my-drosera-trap
 nano drosera.toml
 ```
 Add the following codes at the bottom of `drosera.toml`:
@@ -174,7 +173,7 @@ whitelist = ["Operator_Address"]
 
 **2- Update Trap Configuration:**
 ```bash
-DROSERA_PRIVATE_KEY=xxx drosera apply
+DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey`
 * If RPC issue, use `DROSERA_PRIVATE_KEY=xxx drosera apply --eth-rpc-url RPC` and replace `RPC` with your own.
@@ -217,7 +216,7 @@ docker pull ghcr.io/drosera-network/drosera-operator:latest
 
 ## 4. Register Operator
 ```bash
-drosera-operator register --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key PV_KEY
+drosera-operator register --eth-rpc-url RPC_YOU --eth-private-key PV_KEY
 ```
 * Replace `PV_KEY` with your Drosera EVM `privatekey`. We use the same wallet as our trap wallet.
 
@@ -255,7 +254,7 @@ Restart=always
 RestartSec=15
 LimitNOFILE=65535
 ExecStart=$(which drosera-operator) node --db-file-path $HOME/.drosera.db --network-p2p-port 31313 --server-port 31314 \
-    --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com \
+    --eth-rpc-url RPC_YOU \
     --eth-backup-rpc-url https://1rpc.io/holesky \
     --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 \
     --eth-private-key PV_KEY \
