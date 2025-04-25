@@ -240,7 +240,7 @@ sudo ufw allow 31314/tcp
 sudo ufw allow 30304/tcp
 sudo ufw status
 ```
-## Docker
+## GIT CLONE
 ```
 git clone https://github.com/0xmoei/Drosera-Network
 ```
