@@ -119,7 +119,7 @@ forge build
 
 **Deploy Trap**:
 ```bash
-DROSERA_PRIVATE_KEY=xxx drosera apply
+DROSERA_PRIVATE_KEY=XX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey` (Ensure it's funded with `Holesky ETH`)
 * Enter the command, when prompted, write `ofc` and press Enter.
