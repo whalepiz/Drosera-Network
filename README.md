@@ -235,6 +235,8 @@ sudo ufw enable
 # Allow Drosera ports
 sudo ufw allow 31313/tcp
 sudo ufw allow 31314/tcp
+sudo ufw allow 30304/tcp
+sudo ufw status
 ```
 ## Docker
 ```
