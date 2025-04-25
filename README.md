@@ -242,7 +242,7 @@ sudo ufw status
 ```
 ## GIT CLONE
 ```
-git clone https://github.com/0xmoei/Drosera-Network
+git clone https://github.com/whalepiz/Drosera-Network
 ```
 ```
 cd Drosera-Network
