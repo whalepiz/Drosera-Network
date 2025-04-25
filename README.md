@@ -122,6 +122,7 @@ forge build
 DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey` (Ensure it's funded with `Holesky ETH`)
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * Enter the command, when prompted, write `ofc` and press Enter.
 
 ![image](https://github.com/user-attachments/assets/6d1161f1-4423-4ce6-a1a2-77ce567186dc)
@@ -176,6 +177,7 @@ whitelist = ["Operator_Address"]
 DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey`
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * If RPC issue, use `DROSERA_PRIVATE_KEY=xxx drosera apply --eth-rpc-url RPC` and replace `RPC` with your own.
 
 Your Trap should be private now with your operator address whitelisted internally.
@@ -218,6 +220,7 @@ docker pull ghcr.io/drosera-network/drosera-operator:latest
 ```bash
 drosera-operator register --eth-rpc-url RPC_YOU --eth-private-key PV_KEY
 ```
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * Replace `PV_KEY` with your Drosera EVM `privatekey`. We use the same wallet as our trap wallet.
 
 ---
