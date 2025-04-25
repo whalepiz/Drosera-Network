@@ -268,6 +268,12 @@ nano docker-compose.yaml
 ```
 docker compose up -d
 ```
+```
+cd ~
+cd ~/Drosera-Network
+docker compose down
+docker compose up -d
+```
 
 ### 6-1-3: Check health
 ```
