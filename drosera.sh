@@ -3,7 +3,7 @@
 # Drosera Network Testnet Setup Automation Script (1 Operator Version)
 
 # Ensure we start in ~/Drosera
-cd ~/Drosera || { echo "Error: Cannot change to ~/Drosera directory."; exit 1; }
+cd ~/Drosera-Network || { echo "Error: Cannot change to ~/Drosera-Network  directory."; exit 1; }
 
 # Function to check command success
 check_status() {
