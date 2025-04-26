@@ -17,10 +17,16 @@ After purchasing, access the panel to change the VPS login password
 Select "Change password" to change the password
 ![image](https://github.com/user-attachments/assets/faf2aacf-3562-446d-a075-61259a015fe5)
 
+## Facet Ethereum Holesky 
+
+Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/))
+
 ## Ethereum Holesky RPC URL:
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
 ## PuTTY
+
 * You can use PuTTY to log in to the VPS.
+  
 ![image](https://github.com/user-attachments/assets/869a8124-b57d-4768-bc81-67dc44d6a8d9)
 
 ## GitHub Account:
