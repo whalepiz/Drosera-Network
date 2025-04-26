@@ -35,37 +35,37 @@ cd Drosera-Network && chmod +x drosera.sh && ./drosera.sh
 ## Provide Information:
 *The script will prompt you to enter the following details accurately:
 
-🔸Private Key:
+🔸 Private Key:
 *The 64-character hexadecimal private key of the wallet used to deploy the Trap (without 0x).
 *Example: 1a2b3c4d5e6f78901a2b3c4d5e6f78901a2b3c4d5e6f78901a2b3c4d5e6f7890
 
-🔸Public Address:
+🔸 Public Address:
 *The 42-character Ethereum address (with 0x) of the wallet.
 *Example: 0x.........
 
-🔸Ethereum Holesky RPC URL:
+🔸 Ethereum Holesky RPC URL:
 *Your RPC URL from Alchemy, QuickNode, or a public node. Press Enter to use the default (https://ethereum-holesky-rpc.publicnode.com).
 *Example: https://eth-holesky.alchemyapi.io/v2/your-api-key
 
-🔸GitHub Email:
+🔸 GitHub Email:
 The email address associated with your GitHub account.
 Example: your.email@example.com
 
-🔸GitHub Username:
+🔸 GitHub Username:
 *Your GitHub username.
 *Example: yourusername
 
 ## Check Node Liveness
 
-🔸Once the script execution is complete, navigate to the Drosera Dashboard at https://app.drosera.io/ to verify node activity. Look for green blocks, which indicate that your nodes are live and operational.
+🔸 Once the script execution is complete, navigate to the Drosera Dashboard at https://app.drosera.io/ to verify node activity. Look for green blocks, which indicate that your nodes are live and operational.
 
-🔸To monitor node performance in real-time, you can inspect the Docker logs using the following command:
+🔸 To monitor node performance in real-time, you can inspect the Docker logs using the following command:
 
 ```
 cd ~/Drosera-Network
 docker logs drosera-node
 ```
-🔸Check That you Have Green Block Log on your Dashboard ( Wait For At Least 1 Hour To Check )
+🔸 Check That you Have Green Block Log on your Dashboard ( Wait For At Least 1 Hour To Check )
 
 ![image](https://github.com/user-attachments/assets/0d1b0211-f970-45b2-9be2-3c4db6554d7c)
 
