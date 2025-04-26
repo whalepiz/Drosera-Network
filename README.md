@@ -5,7 +5,7 @@ In this Guide, we contribute to Drosera testnet by:
 3. Deploying a Trap on testnet
 4. Connecting an operator to the Trap
 
-# Recommended System Requirements
+## Recommended System Requirements
 * 2 CPU Cores
 * 4 GB RAM
 * 20 GB Disk Space
@@ -17,22 +17,22 @@ After purchasing, access the panel to change the VPS login password
 Select "Change password" to change the password
 ![image](https://github.com/user-attachments/assets/faf2aacf-3562-446d-a075-61259a015fe5)
 
-# Ethereum Holesky RPC URL:
+## Ethereum Holesky RPC URL:
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
-# PuTTY
+## PuTTY
 * You can use PuTTY to log in to the VPS.
 ![image](https://github.com/user-attachments/assets/869a8124-b57d-4768-bc81-67dc44d6a8d9)
 
-# GitHub Account:
+## GitHub Account:
 *Provide your GitHub email and username for configuring Git during the setup
 
-# Installation
+## Installation
 ◾Clone the Repository
 ```
 git clone https://github.com/whalepiz/Drosera-Network/
 cd Drosera-Network && chmod +x drosera.sh && ./drosera.sh
 ```
-# Provide Information:
+## Provide Information:
 *The script will prompt you to enter the following details accurately:
 
 🔸Private Key:
