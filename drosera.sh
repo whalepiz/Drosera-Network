@@ -41,9 +41,10 @@ source /root/.bashrc
 
 # Display Crypton header and Twitter prompt
 clear
-figlet -f big "Piz"
+figlet -f big "Piz - Nexgen Explore"
 echo "============================================================="
-echo "Follow me on Twitter for updates and more: https://x.com/whalepiz_"
+echo "Follow me on Twitter for updates and more: https://x.com/whalepiz"
+echo "Join my Telegram group here: https://t.me/Nexgenexplore"
 echo "============================================================="
 echo ""
 
