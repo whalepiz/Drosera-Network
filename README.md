@@ -36,24 +36,12 @@ cd Drosera-Network && chmod +x drosera.sh && ./drosera.sh
 *The script will prompt you to enter the following details accurately:
 
 🔸 Private Key:
-*The 64-character hexadecimal private key of the wallet used to deploy the Trap (without 0x).
-*Example: 1a2b3c4d5e6f78901a2b3c4d5e6f78901a2b3c4d5e6f78901a2b3c4d5e6f7890
-
 🔸 Public Address:
-*The 42-character Ethereum address (with 0x) of the wallet.
-*Example: 0x.........
-
 🔸 Ethereum Holesky RPC URL:
-*Your RPC URL from Alchemy, QuickNode, or a public node. Press Enter to use the default (https://ethereum-holesky-rpc.publicnode.com).
-*Example: https://eth-holesky.alchemyapi.io/v2/your-api-key
-
+* Your RPC URL from Alchemy, QuickNode, or a public node. Press Enter to use the default (https://ethereum-holesky-rpc.publicnode.com).
+* Example: https://eth-holesky.alchemyapi.io/v2/your-api-key
 🔸 GitHub Email:
-The email address associated with your GitHub account.
-Example: your.email@example.com
-
 🔸 GitHub Username:
-*Your GitHub username.
-*Example: yourusername
 
 ## Check Node Liveness
 
