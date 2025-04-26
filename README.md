@@ -19,7 +19,7 @@ Select "Change password" to change the password
 
 ## Facet Ethereum Holesky 
 
-Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/))
+Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/)
 
 ## Ethereum Holesky RPC URL:
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
