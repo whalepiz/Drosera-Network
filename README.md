@@ -36,11 +36,14 @@ cd Drosera-Network && chmod +x drosera.sh && ./drosera.sh
 *The script will prompt you to enter the following details accurately:
 
 🔸 Private Key: 
+
 🔸 Public Address: 
+
 🔸 Ethereum Holesky RPC URL: 
 * Your RPC URL from Alchemy, QuickNode, or a public node. Press Enter to use the default (https://ethereum-holesky-rpc.publicnode.com).
 * Example: https://eth-holesky.alchemyapi.io/v2/your-api-key
-🔸 GitHub Email: 
+🔸 GitHub Email:
+
 🔸 GitHub Username: 
 
 ## Check Node Liveness
