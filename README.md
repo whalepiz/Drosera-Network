@@ -27,7 +27,7 @@ Select "Change password" to change the password
 *Provide your GitHub email and username for configuring Git during the setup
 
 ## Installation
-◾Clone the Repository
+◾ Clone the Repository
 ```
 git clone https://github.com/whalepiz/Drosera-Network/
 cd Drosera-Network && chmod +x drosera.sh && ./drosera.sh
