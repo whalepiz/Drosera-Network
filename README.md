@@ -119,9 +119,10 @@ forge build
 
 **Deploy Trap**:
 ```bash
-DROSERA_PRIVATE_KEY=xxx drosera apply
+DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey` (Ensure it's funded with `Holesky ETH`)
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * Enter the command, when prompted, write `ofc` and press Enter.
 
 ![image](https://github.com/user-attachments/assets/6d1161f1-4423-4ce6-a1a2-77ce567186dc)
@@ -161,7 +162,6 @@ drosera dryrun
 ## 1. Whitelist Your Operator
 **1- Edit Trap configuration:**
 ```bash
-cd my-drosera-trap
 nano drosera.toml
 ```
 Add the following codes at the bottom of `drosera.toml`:
@@ -172,11 +172,14 @@ whitelist = ["Operator_Address"]
 * Replace `Operator_Address` with your EVM wallet `Public Address` between " " symbols
 * Your `Public Address` is your `Operator_Address`.
 
+## Wait 10 minutes and continue!
+
 **2- Update Trap Configuration:**
 ```bash
-DROSERA_PRIVATE_KEY=xxx drosera apply
+DROSERA_PRIVATE_KEY=XXX drosera apply --eth-rpc-url RPC_YOU
 ```
 * Replace `xxx` with your EVM wallet `privatekey`
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * If RPC issue, use `DROSERA_PRIVATE_KEY=xxx drosera apply --eth-rpc-url RPC` and replace `RPC` with your own.
 
 Your Trap should be private now with your operator address whitelisted internally.
@@ -217,8 +220,9 @@ docker pull ghcr.io/drosera-network/drosera-operator:latest
 
 ## 4. Register Operator
 ```bash
-drosera-operator register --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key PV_KEY
+drosera-operator register --eth-rpc-url RPC_YOU --eth-private-key PV_KEY
 ```
+* Replace RPC_YOU with your RPC created on [alchemy](https://dashboard.alchemy.com/).
 * Replace `PV_KEY` with your Drosera EVM `privatekey`. We use the same wallet as our trap wallet.
 
 ---
@@ -233,70 +237,68 @@ sudo ufw enable
 # Allow Drosera ports
 sudo ufw allow 31313/tcp
 sudo ufw allow 31314/tcp
+sudo ufw allow 30304/tcp
+sudo ufw status
 ```
+## GIT CLONE
+```
+git clone https://github.com/whalepiz/Drosera-Network
+```
+```
+cd Drosera-Network
+```
+```
+cp .env.example .env
+```
+Edit `.env` file:
+```
+nano .env
+```
+* Replace `your_evm_private_key` and `your_vps_public_ip`
+* To save: `CTRL`+`X`, `Y` & `ENTER`.
 
----
-
-## SystemD
-### 6: Configure SystemD service file
-Enter this command in the terminal, But first replace:
-* `PV_KEY` with your `privatekey`
-* `VPS_IP` with your solid vps IP (without anything else)
-* Replace default `https://ethereum-holesky-rpc.publicnode.com` to your private [Alchemy](https://dashboard.alchemy.com/) Ethereum Holesky RPCs.
+Edit `docker-compose.yaml` file:
 ```bash
-sudo tee /etc/systemd/system/drosera.service > /dev/null <<EOF
-[Unit]
-Description=drosera node service
-After=network-online.target
+nano docker-compose.yaml
+```
+* Replace default `rpc` to your private [Alchemy](https://dashboard.alchemy.com/) or [QuickNode](https://dashboard.quicknode.com/) Ethereum Holesky RPCs.
+* To save: `CTRL`+`X`, `Y` & `ENTER`.
 
-[Service]
-User=$USER
-Restart=always
-RestartSec=15
-LimitNOFILE=65535
-ExecStart=$(which drosera-operator) node --db-file-path $HOME/.drosera.db --network-p2p-port 31313 --server-port 31314 \
-    --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com \
-    --eth-backup-rpc-url https://1rpc.io/holesky \
-    --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 \
-    --eth-private-key PV_KEY \
-    --listen-address 0.0.0.0 \
-    --network-external-p2p-address VPS_IP \
-    --disable-dnr-confirmation true
-
-[Install]
-WantedBy=multi-user.target
-EOF
+### 6-1-2: Run Operator
+```
+docker compose up -d
+```
+```
+cd ~
+cd ~/Drosera-Network
+docker compose down
+docker compose up -d
 ```
 
-### 6-2-2: Run Operator
-```console
-# reload systemd
-sudo systemctl daemon-reload
-sudo systemctl enable drosera
-
-# start systemd
-sudo systemctl start drosera
+### 6-1-3: Check health
+```
+docker logs -f drosera-node
 ```
 
-### 6-2-3: Check Node Health
-```console
-journalctl -u drosera.service -f
-```
+![image](https://github.com/user-attachments/assets/2ec4d181-ac60-4702-b4f4-9722ef275b50)
 
-![image](https://github.com/user-attachments/assets/a4ad6e66-4749-4780-9347-c878399d4067)
+>  No problem if you are receiveing `WARN drosera_services::network::service: Failed to gossip message: InsufficientPeers`
 
-> !! No problem if you are receiveing `WARN drosera_services::network::service: Failed to gossip message: InsufficientPeers`
-
-### 6-2-4: Optional commands
+### 6-1-4: Optional Docker commands
 ```console
 # Stop node
-sudo systemctl stop drosera
+cd Drosera-Network
+docker compose down -v
 
 # Restart node
-sudo systemctl restart drosera
+cd Drosera-Network
+docker compose up -d
 ```
-**Now running your node using `SystemD`, you can Jump to step 7.**
+
+**Now running your node using `Docker`, you can Jump to step 7.**
+
 ---
+
 
 ## 7. Opt-in Trap
 In the dashboard., Click on `Opti in` to connect your operator to the Trap
