@@ -25,8 +25,8 @@ validate_private_key() {
 echo "Cleaning up previous script runs..."
 pkill -f drosera-operator
 sudo docker compose -f ~/Drosera-Network/docker-compose.yaml down -v 2>/dev/null
-sudo docker WELCOME_TO_DROSERA stop drosera-node1 drosera-node2 2>/dev/null
-sudo docker rm drosera-node1 drosera-node2 2>/dev/null
+sudo docker WELCOME_TO_DROSERA stop drosera-node 2>/dev/null
+sudo docker rm drosera-node 2>/dev/null
 sudo rm -rf ~/my-drosera-trap ~/Drosera-Network ~/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz /usr/bin/drosera-operator ~/drosera-operator
 check_status "Cleanup"
 source /root/.bashrc
@@ -457,7 +457,7 @@ version: '3'
 services:
   drosera1:
     image: ghcr.io/drosera-network/drosera-operator:latest
-    container_name: drosera-node1
+    container_name: drosera-node
     ports:
       - "31313:31313"
       - "31314:31314"
