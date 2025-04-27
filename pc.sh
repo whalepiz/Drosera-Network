@@ -1,224 +1,216 @@
 #!/bin/bash
 
-# Drosera Network Testnet Setup Automation Script (1 Operator Version)
-
-# Ensure we start in ~/Drosera
-cd ~/Drosera || { echo "Error: Cannot change to ~/Drosera directory."; exit 1; }
-
-# Function to check command success
-check_status() {
-    if [[ $? -ne 0 ]]; then
-        echo "Error: $1 failed. Exiting."
-        exit 1
-    fi
-}
-
-# Clean up previous script runs
-echo "Cleaning up previous script runs..."
-pkill -f drosera-operator
-sudo docker compose -f ~/Drosera-Network/docker-compose.yaml down -v 2>/dev/null
-sudo docker stop drosera-node1 2>/dev/null
-sudo docker rm drosera-node1 2>/dev/null
-sudo rm -rf ~/my-drosera-trap ~/Drosera-Network ~/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz /usr/bin/drosera-operator ~/drosera-operator
-check_status "Cleanup"
-source ~/.bashrc
-
-# Install figlet for ASCII art if not present
-if ! command -v figlet &> /dev/null; then
-    echo "Installing figlet for ASCII art..."
-    sudo apt-get update && sudo apt-get install -y figlet
-    check_status "figlet installation"
+# Kiểm tra xem người dùng có quyền sudo không
+if sudo -v &>/dev/null; then
+    echo "Bạn có quyền sử dụng sudo."
+    SUDO_CMD="sudo"
+else
+    echo "Bạn không có quyền sử dụng sudo."
+    SUDO_CMD=""
 fi
-source ~/.bashrc
 
-# Display Crypton header and Twitter prompt
-clear
-figlet -f big "Crypton"
-echo "============================================================="
-echo "Follow me on Twitter for updates and more: https://x.com/0xCrypton_"
-echo "============================================================="
-echo ""
+# Cập nhật và nâng cấp hệ thống
+$SUDO_CMD apt-get update && $SUDO_CMD apt-get upgrade -y
 
-# Welcome message
-echo "Starting Drosera Network Testnet Setup Automation for One Operator"
-echo "Ensure you have funded Holesky ETH wallet for your operator."
-echo ""
+# Cài đặt các gói cần thiết
+$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev -y
 
-# Prompt for required inputs
-read -p "Enter your EVM wallet private key (Operator 1): " OPERATOR1_PRIVATE_KEY
-read -p "Enter your EVM wallet public address (Operator 1): " OPERATOR1_ADDRESS
+# Cài đặt Docker (Nếu người dùng có quyền sudo)
+if [ -n "$SUDO_CMD" ]; then
+    # Cài đặt Docker nếu có quyền sudo
+    $SUDO_CMD apt update -y && $SUDO_CMD apt upgrade -y
+    $SUDO_CMD apt-get install ca-certificates curl gnupg
+    $SUDO_CMD install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO_CMD gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    $SUDO_CMD chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Auto-detect VPS public IP
-echo "Detecting VPS public IP..."
-VPS_IP=$(curl -s ifconfig.me || curl -s icanhazip.com)
-if [[ -z "$VPS_IP" ]]; then
-    read -p "Could not detect VPS public IP. Please enter it manually: " VPS_IP
+    # Thêm kho Docker vào nguồn cài đặt
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    $SUDO_CMD tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    # Cập nhật và nâng cấp lại sau khi thêm kho Docker
+    $SUDO_CMD apt update -y && $SUDO_CMD apt upgrade -y
+    $SUDO_CMD apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+    # Kiểm tra Docker đã cài đặt thành công
+    $SUDO_CMD docker run hello-world
 fi
-echo "VPS public IP: $VPS_IP"
 
-read -p "Enter your Ethereum Holesky RPC URL (press Enter to use default): " ETH_RPC_URL
-if [[ -z "$ETH_RPC_URL" ]]; then
-    ETH_RPC_URL="https://ethereum-holesky-rpc.publicnode.com"
-fi
-read -p "Enter your GitHub email: " GITHUB_EMAIL
-read -p "Enter your GitHub username: " GITHUB_USERNAME
-
-# Step 1: Update and Install Dependencies
-echo "Updating system and installing dependencies..."
-sudo apt-get update && sudo apt-get upgrade -y
-sudo apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip -y
-check_status "Dependency installation"
-source ~/.bashrc
-
-# Step 2: Install Docker if missing
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
-    sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    sudo docker run hello-world
-    check_status "Docker installation"
-fi
-source ~/.bashrc
-
-# Step 3: Install Drosera CLI
-echo "Installing Drosera CLI..."
+# Cài đặt Drosera CLI
 curl -L https://app.drosera.io/install | bash
 source ~/.bashrc
 droseraup
-source ~/.bashrc
 
-# Step 4: Install Foundry CLI
-echo "Installing Foundry CLI..."
+# Cài đặt Foundry CLI
 curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc
 foundryup
-source ~/.bashrc
 
-# Step 5: Install Bun CLI
-echo "Installing Bun CLI..."
+# Cài đặt Bun
 curl -fsSL https://bun.sh/install | bash
 source ~/.bashrc
 
-# Step 6: Trap Setup
-echo "Setting up Trap..."
-mkdir ~/my-drosera-trap
-cd ~/my-drosera-trap
-git config --global user.email "$GITHUB_EMAIL"
-git config --global user.name "$GITHUB_USERNAME"
+# Tạo thư mục cho việc thiết lập Drosera Trap
+mkdir my-drosera-trap
+cd my-drosera-trap
+
+# Nhập email và username của GitHub từ người dùng
+echo "Nhập GitHub Email của bạn:"
+read github_email
+
+echo "Nhập GitHub Username của bạn:"
+read github_username
+
+# Thay đổi thông tin GitHub Email và Username
+git config --global user.email "$github_email"
+git config --global user.name "$github_username"
+
+# Khởi tạo Trap
 forge init -t drosera-network/trap-foundry-template
+
+# Cài đặt Bun và build Trap
 bun install
 forge build
-source ~/.bashrc
 
-# Deploy Trap
-echo "Deploying Trap..."
-DROSERA_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY drosera apply
-check_status "Trap deployment"
-source ~/.bashrc
+# Nhập PRIVATE_KEY và RPC_URL từ người dùng
+echo "Hãy Nhập PRIVATE_KEY của bạn:"
+read private_key
 
-# Extract Trap Address
-TRAP_ADDRESS=$(awk '/\[traps\.mytrap\]/ {p=1} p && /address =/ {print $3; exit}' ~/my-drosera-trap/drosera.toml | tr -d '"')
-if [[ -z "$TRAP_ADDRESS" ]]; then
-    read -p "Failed to extract Trap address. Enter manually: " TRAP_ADDRESS
+echo "Hãy Nhập RPC của bạn:"
+read rpc_url
+
+# Thay thế giá trị PRIVATE_KEY và RPC_URL vào lệnh drosera apply
+DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url
+
+# Hướng dẫn người dùng thực hiện các bước tiếp theo trên trang Drosera
+echo "Bây giờ, bạn cần thực hiện các bước sau trên trang web Drosera:"
+echo "1. Truy cập https://app.drosera.io/."
+echo "2. Kết nối ví của bạn."
+echo "3. Sau khi kết nối ví, hãy click vào 'Traps Owned'."
+echo "4. Tiếp theo, nhấn vào 'Send Bloom Boost' để gửi Holesky ETH."
+echo "Khi bạn đã thực hiện xong, nhấn 'N' để tiếp tục chạy lệnh tiếp theo."
+
+# Hỏi người dùng đã làm xong chưa
+while true; do
+    read -p "Bạn đã làm xong chưa? (Nhấn 'N' để tiếp tục hoặc 'Y' nếu chưa): " response
+    case $response in
+        [Nn]* ) 
+            echo "Tiếp tục chạy lệnh..."
+            break
+            ;;
+        [Yy]* ) 
+            echo "Hãy thực hiện các bước theo hướng dẫn và nhấn 'N' khi bạn đã làm xong."
+            ;;
+        * ) 
+            echo "Vui lòng nhập 'Y' hoặc 'N'."
+            ;;
+    esac
+done
+
+# Chạy lệnh drosera dryrun
+echo "Bây giờ, chạy lệnh drosera dryrun..."
+drosera dryrun
+
+# Nhập địa chỉ ví EVM từ người dùng để thay vào whitelist
+echo "Hãy Nhập địa chỉ ví EVM của bạn (Operator_Address):"
+read operator_address
+
+# Cập nhật file drosera.toml và thay thế vào whitelist
+config_file="./my-drosera-trap/drosera.toml"
+
+# Kiểm tra nếu file drosera.toml tồn tại
+if [[ -f "$config_file" ]]; then
+    # Thêm dòng vào file
+    echo "private_trap = true" >> "$config_file"
+    echo "whitelist = [\"$operator_address\"]" >> "$config_file"
+    echo "Đã thêm địa chỉ ví vào whitelist và cập nhật file drosera.toml."
+else
+    echo "File drosera.toml không tìm thấy trong thư mục my-drosera-trap."
 fi
-echo "Trap Address: $TRAP_ADDRESS"
 
-# Ask to Send Bloom
-echo "Please send Bloom Boost to your Trap at: https://app.drosera.io/"
-read -p "Have you sent Bloom? (y/n): " bloom_sent
-if [[ "$bloom_sent" != "y" ]]; then
-    echo "Please complete the Bloom before proceeding. Exiting."
-    exit 1
-fi
-source ~/.bashrc
+# Đợi 10 phút
+echo "Đang chờ 10 phút..."
+sleep 600  # 600 giây tương đương 10 phút
 
-# Step 7: Whitelist Operator
-echo "Whitelisting Operator..."
-cd ~/my-drosera-trap
-sed -i '/whitelist = \[\]/d' drosera.toml
-cat << EOF >> drosera.toml
-private_trap = true
-whitelist = ["$OPERATOR1_ADDRESS"]
-EOF
+echo "Đã đợi 10 phút. Tiến hành bước tiếp theo..."
 
-echo "Waiting for cooldown..."
-sleep 60
-DROSERA_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY drosera apply
-check_status "Trap whitelist update"
-source ~/.bashrc
+# Cuối cùng, chạy lệnh drosera apply với PRIVATE_KEY và RPC_URL đã thay thế trước đó
+echo "Bây giờ, chạy lệnh drosera apply với các tham số đã thay thế..."
+DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url
 
-# Step 8: Install Operator CLI
-echo "Installing Operator CLI..."
+# Tiến hành cài đặt drosera-operator
+echo "Chuyển đến thư mục home..."
 cd ~
+
+# Tải xuống drosera-operator
+echo "Tải drosera-operator..."
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
+
+# Giải nén và cài đặt drosera-operator
+echo "Giải nén và cài đặt drosera-operator..."
 tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
-sudo cp drosera-operator /usr/bin
-sudo chmod +x /usr/bin/drosera-operator
+
+# Kiểm tra phiên bản
+echo "Kiểm tra phiên bản drosera-operator..."
+./drosera-operator --version
+
+# Di chuyển drosera-operator vào thư mục /usr/bin để chạy toàn cục
+echo "Di chuyển drosera-operator vào /usr/bin..."
+$SUDO_CMD cp drosera-operator /usr/bin
+
+# Kiểm tra lại drosera-operator
+echo "Kiểm tra drosera-operator..."
+drosera-operator
+
+# Cài đặt Docker image của drosera-operator
+echo "Tải Docker image của drosera-operator..."
 docker pull ghcr.io/drosera-network/drosera-operator:latest
-source ~/.bashrc
 
-# Step 9: Register Operator
-echo "Registering Operator..."
-drosera-operator register --eth-rpc-url "$ETH_RPC_URL" --eth-private-key "$OPERATOR1_PRIVATE_KEY"
-check_status "Operator registration"
-sleep 3
-source ~/.bashrc
+# Mở các cổng firewall cần thiết
+echo "Mở các cổng firewall..."
+$SUDO_CMD ufw allow ssh
+$SUDO_CMD ufw allow 22
+$SUDO_CMD ufw enable
 
-# Step 10: Opt-in Operator
-echo "Please log in to https://app.drosera.io/ with your Operator wallet and Opt-in to your Trap."
-read -p "Have you completed Opt-in? (y/n): " optin_done
-if [[ "$optin_done" != "y" ]]; then
-    echo "Opt-in not completed. Exiting."
-    exit 1
-fi
-source ~/.bashrc
+# Cho phép các cổng của Drosera
+$SUDO_CMD ufw allow 31313/tcp
+$SUDO_CMD ufw allow 31314/tcp
+$SUDO_CMD ufw allow 30304/tcp
+$SUDO_CMD ufw status
 
-# Step 11: Open Firewall Ports
-echo "Opening Firewall Ports..."
-sudo ufw allow ssh
-sudo ufw allow 22
-sudo ufw allow 31313/tcp
-sudo ufw allow 31314/tcp
-sudo ufw enable
-source ~/.bashrc
+# Git clone Drosera-Network repository
+echo "Cloning Drosera-Network repository..."
+git clone https://github.com/whalepiz/Drosera-Network
+cd Drosera-Network
+cp .env.example .env
 
-# Step 12: Setup Docker Compose
-echo "Setting up Docker Compose for Operator..."
-mkdir -p ~/Drosera-Network
-cd ~/Drosera-Network
-cat << EOF > .env
-ETH_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY
-VPS_IP=$VPS_IP
-P2P_PORT1=31313
-SERVER_PORT1=31314
-EOF
+# Sửa file .env
+echo "Đang sửa file .env..."
 
-cat << EOF > docker-compose.yaml
-version: '3'
-services:
-  drosera1:
-    image: ghcr.io/drosera-network/drosera-operator:latest
-    container_name: drosera-node1
-    ports:
-      - "31313:31313"
-      - "31314:31314"
-    volumes:
-      - drosera_data1:/data
-    command: node --db-file-path /data/drosera.db --network-p2p-port 31313 --server-port 31314 --eth-rpc-url $ETH_RPC_URL --eth-backup-rpc-url https://holesky.drpc.org --drosera-address $TRAP_ADDRESS --eth-private-key $OPERATOR1_PRIVATE_KEY --listen-address 0.0.0.0 --network-external-p2p-address $VPS_IP --disable-dnr-confirmation true
-    restart: always
-volumes:
-  drosera_data1:
-EOF
+# Thay đổi giá trị your_evm_private_key thành private_key mà người dùng nhập
+sed -i "s/[yY][oO][uU][rR]_[eE][vV]_[pP]rivate_[kK]ey/$private_key/" .env
 
+# Nhập địa chỉ IP của VPS
+echo "Hãy Nhập địa chỉ IP của VPS (your_vps_public_ip):"
+read vps_ip
+
+# Thay đổi giá trị your_vps_public_ip trong file .env
+sed -i "s/[yY][oO][uU][rR]_[vV][pP]s_[pP]ublic_[iI]p/$vps_ip/" .env
+
+echo "File .env đã được sửa và lưu lại."
+
+# Tiến hành chạy lệnh `docker compose up -d`
+echo "Chạy docker compose up -d..."
 docker compose up -d
-check_status "Operator Node started"
 
-# Step 13: Dryrun to verify
-echo "Running drosera dryrun..."
-cd ~/my-drosera-trap
-drosera dryrun || echo "Warning: dryrun failed (can be ignored sometimes)"
-sleep 3
+# Quay lại thư mục home và chạy các lệnh docker compose tiếp theo
+cd ~
 
-# Final message
-echo "✅ Drosera Network Testnet Setup Complete for One Operator!"
-echo "Check dashboard at https://app.drosera.io/ for liveness (green blocks)."
-echo "Follow Crypton on Twitter: https://x.com/0xCrypton_"
+# Quay lại thư mục Drosera-Network và tắt Docker container
+cd ~/Drosera-Network
+docker compose down
+
+# Chạy lại Docker container với lệnh up
+docker compose up -d
