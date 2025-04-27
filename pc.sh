@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # ========================
-# Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Auto Apply + Banner PIZ + Sửa .env đầy đủ
+# Script Cài Drosera Trap + Operator FULL AUTO (Tối ưu tự động source ~/.bashrc)
 # ========================
 
 # Định nghĩa màu sắc
@@ -15,13 +14,13 @@ NC='\033[0m' # No Color
 loading_bar() {
   duration=$1
   for ((i=1; i<=$duration; i++)); do
-    printf "\r⏳ Đang chờ %s giây..." "$i"
+    printf "\r\u23F3 Đang chờ %s giây..." "$i"
     sleep 1
   done
-  echo -e "\n${GREEN}✅ Hoàn thành đợi!${NC}"
+  echo -e "\n${GREEN}\u2705 Hoàn thành đợi!${NC}"
 }
 
-# 1. Kiểm tra quyền sudo
+# Kiểm tra sudo
 if sudo -v &>/dev/null; then
     echo -e "${GREEN}Bạn có quyền sudo.${NC}"
     SUDO_CMD="sudo"
@@ -30,13 +29,11 @@ else
     SUDO_CMD=""
 fi
 
-# 2. Cập nhật hệ thống
+# Update và cài đặt gói cần thiết
 $SUDO_CMD apt-get update && $SUDO_CMD apt-get upgrade -y
-
-# 3. Cài các gói cần thiết
 $SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip ca-certificates gnupg figlet -y
 
-# 4. Cài Docker
+# Cài Docker
 if [ -n "$SUDO_CMD" ]; then
     $SUDO_CMD install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO_CMD gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -46,48 +43,45 @@ if [ -n "$SUDO_CMD" ]; then
     $SUDO_CMD docker run hello-world
 fi
 
-# 5. Cài CLI Tools
-curl -L https://app.drosera.io/install | bash
-curl -L https://foundry.paradigm.xyz | bash
-curl -fsSL https://bun.sh/install | bash
+# Hàm cài đặt CLI tool
+install_cli() {
+    local name=$1
+    local url=$2
+    local cmd_check=$3
 
-# BẮT BUỘC: source ~/.bashrc để cập nhật biến môi trường
-echo -e "${YELLOW}➡️ Vui lòng chạy lệnh sau rồi chạy lại script:${NC}"
-echo ""
-echo -e "${GREEN}source ~/.bashrc${NC}"
-echo ""
-echo -e "${YELLOW}➡️ Sau đó chạy lại script này để tiếp tục.${NC}"
-exit 1
+    echo "Installing $name..."
+    curl -fsSL "$url" | bash
+    sleep 3
+    source ~/.bashrc
+    if ! command -v "$cmd_check" &> /dev/null; then
+        echo "Retry installing $name..."
+        curl -fsSL "$url" | bash
+        sleep 3
+        source ~/.bashrc
+        if ! command -v "$cmd_check" &> /dev/null; then
+            echo -e "${RED}$name installation failed.${NC}"
+            exit 1
+        fi
+    fi
+    echo "✅ $name installed."
+}
 
-# ---------------------------------------------------
-# Từ đây trở xuống sẽ chạy lại sau khi đã source ~/.bashrc
-# ---------------------------------------------------
+# Cài Drosera CLI
+install_cli "Drosera CLI" "https://app.drosera.io/install" "drosera"
 
-# Check xem đã có forge, bun, drosera chưa
-if ! command -v forge &> /dev/null; then
-    echo -e "${RED}❌ forge chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
-    exit 1
-fi
+# Cài Foundry CLI
+install_cli "Foundry CLI" "https://foundry.paradigm.xyz" "forge"
 
-if ! command -v bun &> /dev/null; then
-    echo -e "${RED}❌ bun chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
-    exit 1
-fi
-
-if ! command -v drosera &> /dev/null; then
-    echo -e "${RED}❌ drosera chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
-    exit 1
-fi
+# Cài Bun CLI
+install_cli "Bun CLI" "https://bun.sh/install" "bun"
 
 # 6. Tạo Trap
 mkdir -p ~/my-drosera-trap
 cd ~/my-drosera-trap
 
 # 7. Git config
-echo "Nhập GitHub Email của bạn:"
-read github_email
-echo "Nhập GitHub Username của bạn:"
-read github_username
+read -p "Nhập GitHub Email của bạn: " github_email
+read -p "Nhập GitHub Username của bạn: " github_username
 
 git config --global user.email "$github_email"
 git config --global user.name "$github_username"
@@ -98,10 +92,8 @@ bun install
 forge build
 
 # 9. Nhập PRIVATE_KEY và RPC_URL
-echo "Nhập PRIVATE_KEY của bạn:"
-read private_key
-echo "Nhập RPC URL của bạn:"
-read rpc_url
+read -p "Nhập PRIVATE_KEY của bạn: " private_key
+read -p "Nhập RPC URL của bạn: " rpc_url
 
 export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
@@ -118,24 +110,15 @@ fi
 
 # 12. Hướng dẫn thao tác web
 clear
-echo -e "${YELLOW}➡️ Hãy làm theo các bước sau đây:${NC}"
-echo -e "1. Truy cập vào Website: https://app.drosera.io/"
-echo -e "2. Kết nối ví EVM của bạn"
-echo -e "3. Nhấn vào Traps Owned"
-echo -e "4. Nhấn vào Send Bloom Boost rồi gửi Holesky ETH"
-
-echo ""
+echo -e "${YELLOW}➡️ Truy cập: https://app.drosera.io/ để Send Bloom Boost.${NC}"
 while true; do
     read -p "Hoàn thành Send Bloom Boost chưa? (N để tiếp tục / Y nếu chưa): " response
     [[ "$response" =~ ^[Nn]$ ]] && break
     echo "Hãy hoàn thành Send Bloom Boost trên web trước khi tiếp tục."
 done
 
-drosera dryrun
-
 # 13. Update whitelist
-echo "Nhập địa chỉ ví EVM Operator của bạn:"
-read operator_address
+read -p "Nhập địa chỉ ví EVM Operator của bạn: " operator_address
 
 echo "private_trap = true" >> drosera.toml
 echo "whitelist = [\"$operator_address\"]" >> drosera.toml
@@ -184,17 +167,8 @@ $SUDO_CMD docker compose up -d
 $SUDO_CMD docker compose down
 $SUDO_CMD docker compose up -d
 
-echo -e "${GREEN}✅ Hoàn tất!${NC}"
-
 # 22. Hướng dẫn Opti In sau cài
-echo ""
-echo -e "${YELLOW}➡️ Bước tiếp theo:${NC}"
-echo "1. Truy cập vào Website: https://app.drosera.io/"
-echo "2. Kết nối ví EVM của bạn"
-echo "3. Nhấn vào Traps Owned"
-echo "4. Nhấn vào Opti In"
-echo ""
-
+echo -e "${YELLOW}➡️ Truy cập: https://app.drosera.io/ để thực hiện Opti In.${NC}"
 while true; do
     read -p "Bạn đã nhấn vào Opti In và thực hiện lệnh chưa? (N để tiếp tục / Y nếu chưa): " response
     [[ "$response" =~ ^[Nn]$ ]] && break
@@ -202,8 +176,5 @@ while true; do
 done
 
 # 23. Chúc mừng hoàn tất
-echo ""
-echo -e "${GREEN}🎉 CHÚC MỪNG BẠN ĐÃ HOÀN TẤT QUÁ TRÌNH CÀI ĐẶT NODE!${NC}"
-echo -e "${YELLOW}➡️ ĐỂ NODE HOẠT ĐỘNG TỐT VÀ HIỆN CÁC THANH MÀU XANH SẼ MẤT TỪ 1 TIẾNG ĐẾN 5 TIẾNG.${NC}"
-echo -e "${YELLOW}➡️ HÃY KIÊN NHẪN ĐỢI.${NC}"
-echo ""
+echo -e "\n${GREEN}🎉 CHÚC MỪNG BẠN ĐÃ HOÀN TẤT QUÁ TRÌNH CÀI ĐẶT NODE!${NC}"
+echo -e "${YELLOW}➡️ Để node hoạt động ổn định, vui lòng kiên nhẫn đợi từ 1-5 tiếng.${NC}\n"
