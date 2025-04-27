@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Chuẩn tách riêng drosera apply tay
+# Phiên bản: Tự động apply bằng echo "ofc"
 # ========================
 
 # 1. Kiểm tra quyền sudo
@@ -65,33 +65,11 @@ export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
 source ~/.bashrc
 
-# 11. Hướng dẫn chạy drosera apply thủ công
-echo ""
-echo "⚡ Vui lòng CHẠY LỆNH SAU trong terminal để apply Trap:"
-echo ""
-echo "DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url"
-echo ""
-echo "➡️ Sau khi chạy lệnh và hoàn thành bước apply, hãy quay lại đây và nhấn N để tiếp tục."
-echo ""
+# 11. Tự động apply trap lần 1
+echo "⚡ Đang apply trap lần đầu..."
+echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
-# 12. Dừng chờ xác nhận từ người dùng
-while true; do
-    read -p "Bạn đã hoàn thành drosera apply chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
-    case $response in
-        [Nn]* ) 
-            echo "Tiếp tục..."
-            break
-            ;;
-        [Yy]* ) 
-            echo "Hãy chạy lệnh apply trước khi tiếp tục."
-            ;;
-        * ) 
-            echo "Chỉ được nhập 'Y' hoặc 'N'."
-            ;;
-    esac
-done
-
-# 13. Check drosera.toml tồn tại
+# 12. Check drosera.toml tồn tại
 cd ~/my-drosera-trap
 if [[ -f "drosera.toml" ]]; then
     echo "✅ File drosera.toml đã tồn tại."
@@ -100,13 +78,13 @@ else
     exit 1
 fi
 
-# 14. Hướng dẫn thao tác web
+# 13. Hướng dẫn thao tác web
 echo "➡️ Tiếp theo, truy cập https://app.drosera.io/"
 echo "1. Kết nối ví => Traps Owned."
 echo "2. Gửi Holesky ETH (Send Bloom Boost)."
 echo "3. Sau khi xong, quay lại đây và nhấn N để tiếp tục."
 
-# 15. Hỏi user đã xong chưa
+# 14. Hỏi user đã xong chưa
 while true; do
     read -p "Bạn đã xong trên web chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
     case $response in
@@ -123,10 +101,10 @@ while true; do
     esac
 done
 
-# 16. drosera dryrun
+# 15. drosera dryrun
 drosera dryrun
 
-# 17. Update whitelist
+# 16. Update whitelist
 echo "Nhập địa chỉ ví EVM Operator của bạn:"
 read operator_address
 
@@ -134,37 +112,18 @@ echo "private_trap = true" >> drosera.toml
 echo "whitelist = [\"$operator_address\"]" >> drosera.toml
 echo "✅ Đã thêm whitelist vào drosera.toml."
 
-# 18. Chờ 10 phút để sync
+# 17. Chờ 10 phút để sync
 echo "⌛ Đang đợi 10 phút sync trap..."
 for ((i=10; i>0; i--)); do
     echo "Còn $i phút..."
     sleep 60
 done
 
-# 19. Apply lần 2
-echo ""
-echo "⚡ Bây giờ bạn cần tự chạy lại lệnh apply lần 2:"
-echo ""
-echo "DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url"
-echo ""
+# 18. Apply lại lần 2 tự động
+echo "⚡ Đang apply trap lần 2..."
+echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
-while true; do
-    read -p "Bạn đã chạy lại apply lần 2 chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
-    case $response in
-        [Nn]* ) 
-            echo "Tiếp tục..."
-            break
-            ;;
-        [Yy]* ) 
-            echo "Hãy chạy lại apply trước khi tiếp tục."
-            ;;
-        * ) 
-            echo "Chỉ được nhập 'Y' hoặc 'N'."
-            ;;
-    esac
-done
-
-# 20. Cài drosera-operator
+# 19. Cài drosera-operator
 cd ~
 echo "⬇️ Tải drosera-operator..."
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
@@ -172,10 +131,10 @@ tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 $SUDO_CMD cp drosera-operator /usr/bin/
 drosera-operator --version
 
-# 21. Docker Image drosera-operator
+# 20. Docker Image drosera-operator
 docker pull ghcr.io/drosera-network/drosera-operator:latest
 
-# 22. Mở firewall
+# 21. Mở firewall
 $SUDO_CMD ufw allow ssh
 $SUDO_CMD ufw allow 22
 $SUDO_CMD ufw allow 31313/tcp
@@ -184,7 +143,7 @@ $SUDO_CMD ufw allow 30304/tcp
 $SUDO_CMD ufw --force enable
 $SUDO_CMD ufw status
 
-# 23. Clone Drosera-Network + chỉnh .env
+# 22. Clone Drosera-Network + chỉnh .env
 cd ~
 git clone https://github.com/whalepiz/Drosera-Network
 cd Drosera-Network
@@ -196,7 +155,7 @@ echo "Nhập địa chỉ IP Public của VPS:"
 read vps_ip
 sed -i "s/[yY][oO][uU][rR]_[vV][pP]s_[pP]ublic_[iI]p/$vps_ip/" .env
 
-# 24. docker compose
+# 23. docker compose
 docker compose up -d
 docker compose down
 docker compose up -d
