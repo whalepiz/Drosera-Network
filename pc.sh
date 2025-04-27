@@ -92,22 +92,8 @@ echo "3. Sau khi kết nối ví, hãy click vào 'Traps Owned'."
 echo "4. Tiếp theo, nhấn vào 'Send Bloom Boost' để gửi Holesky ETH."
 echo "Khi bạn đã thực hiện xong, nhấn 'N' để tiếp tục chạy lệnh tiếp theo."
 
-# Hỏi người dùng đã làm xong chưa
-while true; do
-    read -p "Bạn đã làm xong chưa? (Nhấn 'N' để tiếp tục hoặc 'Y' nếu chưa): " response
-    case $response in
-        [Nn]* ) 
-            echo "Tiếp tục chạy lệnh..."
-            break
-            ;;
-        [Yy]* ) 
-            echo "Hãy thực hiện các bước theo hướng dẫn và nhấn 'N' khi bạn đã làm xong."
-            ;;
-        * ) 
-            echo "Vui lòng nhập 'Y' hoặc 'N'."
-            ;;
-    esac
-done
+# Tự động tiếp tục sau khi thực hiện các bước trên trang web Drosera
+echo "Tự động tiếp tục sau khi thực hiện các bước trên trang web Drosera..."
 
 # Chạy lệnh drosera dryrun
 echo "Bây giờ, chạy lệnh drosera dryrun..."
