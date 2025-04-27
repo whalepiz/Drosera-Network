@@ -157,6 +157,10 @@ sed -i '/whitelist = \[\]/d' drosera.toml
 # 14. Banner + Loading
 clear
 figlet -f big "PIZ - NODE"
+echo "============================================================="
+echo "Follow me on Twitter for updates and more: https://x.com/whalepiz"
+echo "Join the Telegram group: https://t.me/Nexgenexplore"
+echo "============================================================="
 echo -e "${YELLOW}⌛ Đợi 8 phút đồng bộ...${NC}"
 loading_bar 480
 
