@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Thêm Loading + Màu sắc Echo
+# Phiên bản: Loading đẹp + Echo màu + Banner PIZ
 # ========================
 
 # Định nghĩa màu sắc
@@ -14,11 +14,11 @@ NC='\033[0m' # No Color
 # Loading đẹp
 loading_bar() {
   duration=$1
-  for ((i=0; i<$duration; i++)); do
-    printf "\r⏳ Đang đợi %s giây..." "$i"
+  for ((i=1; i<=$duration; i++)); do
+    printf "\r⏳ Đang chờ %s giây..." "$i"
     sleep 1
   done
-  echo -e "\n${GREEN}✅ Xong đợi!${NC}"
+  echo -e "\n${GREEN}✅ Hoàn thành đợi!${NC}"
 }
 
 # ========================
@@ -79,7 +79,7 @@ bun install
 forge build
 
 # 9. Nhập PRIVATE_KEY và RPC_URL
-echo -e "${YELLOW}⚡ Nhập thông tin kết nối blockchain...${NC}"
+echo -e "${YELLOW}⚡ Nhập thông tin Blockchain...${NC}"
 echo "Nhập PRIVATE_KEY của bạn:"
 read private_key
 echo "Nhập RPC URL của bạn:"
@@ -104,10 +104,10 @@ else
 fi
 
 # 13. Hướng dẫn thao tác web
-echo -e "${YELLOW}➡️ Truy cập https://app.drosera.io/ và gửi Bloom Boost.${NC}"
+echo -e "${YELLOW}➡️ Truy cập https://app.drosera.io/ để gửi Bloom Boost.${NC}"
 
 while true; do
-    read -p "Bạn đã xong trên web chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
+    read -p "Bạn đã hoàn thành gửi Boost chưa? (N để tiếp tục / Y nếu chưa): " response
     case $response in
         [Nn]* ) break ;;
         [Yy]* ) echo "Hãy hoàn thành trên web trước khi tiếp tục." ;;
@@ -130,11 +130,24 @@ sed -i '/whitelist = \[\]/d' drosera.toml
 
 echo -e "${GREEN}✅ Đã thêm whitelist vào drosera.toml và xoá whitelist = [] cũ.${NC}"
 
-# 16. Chờ 10 phút để sync (loading đẹp)
+# 16. Hiển thị Banner và Loading 10 phút
+if ! command -v figlet &> /dev/null
+then
+    echo -e "${YELLOW}⚡ Đang cài figlet để in banner đẹp...${NC}"
+    $SUDO_CMD apt install figlet -y
+fi
+
+clear
+figlet -f big "PIZ"
+echo "============================================================="
+echo "Follow me on Twitter for updates and more: https://whalepiz"
+echo "============================================================="
+echo ""
+
 echo -e "${YELLOW}⌛ Đang chờ 10 phút để đồng bộ trap...${NC}"
 loading_bar 600
 
-# 17. Apply lại trap lần 2 (Auto Apply)
+# 17. Apply lại trap lần 2
 echo -e "${YELLOW}⚡ Apply Trap lần 2...${NC}"
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
