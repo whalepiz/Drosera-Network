@@ -43,37 +43,44 @@ if [ -n "$SUDO_CMD" ]; then
     $SUDO_CMD docker run hello-world
 fi
 
-# Hàm cài đặt CLI tool
-install_cli() {
-    local name=$1
-    local url=$2
-    local cmd_check=$3
+# Cài Drosera CLI
+echo "Installing Drosera CLI..."
+curl -L https://app.drosera.io/install | bash
+sleep 3
+source ~/.bashrc
 
-    echo "Installing $name..."
-    curl -fsSL "$url" | bash
+if command -v droseraup &> /dev/null; then
+    echo "Running droseraup to complete Drosera installation..."
+    droseraup
     sleep 3
     source ~/.bashrc
-    if ! command -v "$cmd_check" &> /dev/null; then
-        echo "Retry installing $name..."
-        curl -fsSL "$url" | bash
-        sleep 3
-        source ~/.bashrc
-        if ! command -v "$cmd_check" &> /dev/null; then
-            echo -e "${RED}$name installation failed.${NC}"
-            exit 1
-        fi
-    fi
-    echo "✅ $name installed."
-}
+else
+    echo -e "${RED}❌ droseraup command not found after install.${NC}"
+    exit 1
+fi
 
-# Cài Drosera CLI
-install_cli "Drosera CLI" "https://app.drosera.io/install" "drosera"
+if ! command -v drosera &> /dev/null; then
+    echo -e "${RED}❌ Drosera CLI installation failed even after droseraup.${NC}"
+    exit 1
+fi
 
 # Cài Foundry CLI
-install_cli "Foundry CLI" "https://foundry.paradigm.xyz" "forge"
+curl -L https://foundry.paradigm.xyz | bash
+sleep 3
+source ~/.bashrc
+if ! command -v forge &> /dev/null; then
+    echo -e "${RED}❌ Foundry CLI installation failed.${NC}"
+    exit 1
+fi
 
 # Cài Bun CLI
-install_cli "Bun CLI" "https://bun.sh/install" "bun"
+curl -fsSL https://bun.sh/install | bash
+sleep 3
+source ~/.bashrc
+if ! command -v bun &> /dev/null; then
+    echo -e "${RED}❌ Bun CLI installation failed.${NC}"
+    exit 1
+fi
 
 # 6. Tạo Trap
 mkdir -p ~/my-drosera-trap
