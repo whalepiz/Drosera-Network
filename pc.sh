@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Tự động apply bằng echo "ofc"
+# Phiên bản: Auto Apply + Fix whitelist = []
 # ========================
 
 # 1. Kiểm tra quyền sudo
@@ -65,7 +65,7 @@ export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
 source ~/.bashrc
 
-# 11. Tự động apply trap lần 1
+# 11. Apply trap lần 1 (Auto Apply)
 echo "⚡ Đang apply trap lần đầu..."
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
@@ -79,7 +79,7 @@ else
 fi
 
 # 13. Hướng dẫn thao tác web
-echo "➡️ Tiếp theo, truy cập https://app.drosera.io/"
+echo "➡️ Truy cập https://app.drosera.io/"
 echo "1. Kết nối ví => Traps Owned."
 echo "2. Gửi Holesky ETH (Send Bloom Boost)."
 echo "3. Sau khi xong, quay lại đây và nhấn N để tiếp tục."
@@ -108,9 +108,14 @@ drosera dryrun
 echo "Nhập địa chỉ ví EVM Operator của bạn:"
 read operator_address
 
+# Ghi vào drosera.toml
 echo "private_trap = true" >> drosera.toml
 echo "whitelist = [\"$operator_address\"]" >> drosera.toml
-echo "✅ Đã thêm whitelist vào drosera.toml."
+
+# Xóa dòng whitelist = [] cũ
+sed -i '/whitelist = \[\]/d' drosera.toml
+
+echo "✅ Đã thêm whitelist vào drosera.toml và xoá whitelist = [] cũ."
 
 # 17. Chờ 10 phút để sync
 echo "⌛ Đang đợi 10 phút sync trap..."
@@ -119,7 +124,7 @@ for ((i=10; i>0; i--)); do
     sleep 60
 done
 
-# 18. Apply lại lần 2 tự động
+# 18. Apply lại trap lần 2 (Auto Apply)
 echo "⚡ Đang apply trap lần 2..."
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
