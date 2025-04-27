@@ -50,7 +50,7 @@ fi
 curl -L https://app.drosera.io/install | bash
 curl -L https://foundry.paradigm.xyz | bash
 curl -fsSL https://bun.sh/install | bash
-source ~/.bashrc
+source /root/.bashrc
 
 # 6. Tạo Trap
 mkdir -p ~/my-drosera-trap
@@ -78,7 +78,7 @@ read rpc_url
 
 export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
-source ~/.bashrc
+source /root/.bashrc
 
 # 10. Apply trap lần 1
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
