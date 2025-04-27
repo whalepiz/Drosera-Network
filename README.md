@@ -61,7 +61,7 @@ cd Drosera-Network && chmod +x pc.sh && ./pc.sh
 
 ```
 cd ~/Drosera-Network
-docker logs drosera-node
+docker logs -f drosera-node
 ```
 🔸 Check That you Have Green Block Log on your Dashboard ( Wait For At Least 1 Hour To Check )
 
