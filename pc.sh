@@ -176,6 +176,10 @@ $SUDO_CMD cp drosera-operator /usr/bin/
 # 17. Docker Image operator
 $SUDO_CMD docker pull ghcr.io/drosera-network/drosera-operator:latest
 
+# 17.1 Đăng ký operator node
+echo -e "${GREEN}Đăng ký operator node...${NC}"
+drosera-operator register --eth-rpc-url "$rpc_url" --eth-private-key "$private_key"
+
 # 18. Mở firewall
 $SUDO_CMD ufw allow ssh
 $SUDO_CMD ufw allow 22
