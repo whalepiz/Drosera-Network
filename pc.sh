@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Auto Apply + Fix whitelist = []
+# Phiên bản: Auto Apply + Fix whitelist + Sudo Docker
 # ========================
 
 # 1. Kiểm tra quyền sudo
@@ -137,7 +137,7 @@ $SUDO_CMD cp drosera-operator /usr/bin/
 drosera-operator --version
 
 # 20. Docker Image drosera-operator
-docker pull ghcr.io/drosera-network/drosera-operator:latest
+$SUDO_CMD docker pull ghcr.io/drosera-network/drosera-operator:latest
 
 # 21. Mở firewall
 $SUDO_CMD ufw allow ssh
@@ -161,8 +161,8 @@ read vps_ip
 sed -i "s/[yY][oO][uU][rR]_[vV][pP]s_[pP]ublic_[iI]p/$vps_ip/" .env
 
 # 23. docker compose
-docker compose up -d
-docker compose down
-docker compose up -d
+$SUDO_CMD docker compose up -d
+$SUDO_CMD docker compose down
+$SUDO_CMD docker compose up -d
 
 echo "✅ Hoàn tất cài đặt Drosera Trap + Operator!"
