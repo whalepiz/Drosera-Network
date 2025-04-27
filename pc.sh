@@ -34,7 +34,7 @@ fi
 $SUDO_CMD apt-get update && $SUDO_CMD apt-get upgrade -y
 
 # 3. Cài các gói cần thiết
-$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev ca-certificates gnupg figlet -y
+$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip ca-certificates gnupg figlet -y
 
 # 4. Cài Docker
 if [ -n "$SUDO_CMD" ]; then
@@ -50,7 +50,34 @@ fi
 curl -L https://app.drosera.io/install | bash
 curl -L https://foundry.paradigm.xyz | bash
 curl -fsSL https://bun.sh/install | bash
-source /root/.bashrc
+
+# BẮT BUỘC: source ~/.bashrc để cập nhật biến môi trường
+echo -e "${YELLOW}➡️ Vui lòng chạy lệnh sau rồi chạy lại script:${NC}"
+echo ""
+echo -e "${GREEN}source ~/.bashrc${NC}"
+echo ""
+echo -e "${YELLOW}➡️ Sau đó chạy lại script này để tiếp tục.${NC}"
+exit 1
+
+# ---------------------------------------------------
+# Từ đây trở xuống sẽ chạy lại sau khi đã source ~/.bashrc
+# ---------------------------------------------------
+
+# Check xem đã có forge, bun, drosera chưa
+if ! command -v forge &> /dev/null; then
+    echo -e "${RED}❌ forge chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
+    exit 1
+fi
+
+if ! command -v bun &> /dev/null; then
+    echo -e "${RED}❌ bun chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
+    exit 1
+fi
+
+if ! command -v drosera &> /dev/null; then
+    echo -e "${RED}❌ drosera chưa được cài đặt hoặc chưa source ~/.bashrc${NC}"
+    exit 1
+fi
 
 # 6. Tạo Trap
 mkdir -p ~/my-drosera-trap
@@ -78,7 +105,7 @@ read rpc_url
 
 export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
-source /root/.bashrc
+source ~/.bashrc
 
 # 10. Apply trap lần 1
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
