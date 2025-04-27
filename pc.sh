@@ -65,8 +65,8 @@ export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
 source ~/.bashrc
 
-# 11. Apply lần 1 (bắt buộc tạo drosera.toml)
-drosera apply --eth-rpc-url "$rpc_url"
+# 11. Apply lần 1 (bắt buộc tạo drosera.toml) - THÊM --yes
+drosera apply --eth-rpc-url "$rpc_url" --yes
 
 # 12. Quay về đúng thư mục trap
 cd ~/my-drosera-trap
@@ -120,8 +120,8 @@ for ((i=10; i>0; i--)); do
     sleep 60
 done
 
-# 19. Apply lại lần 2
-drosera apply --eth-rpc-url "$rpc_url"
+# 19. Apply lại lần 2 - THÊM --yes
+drosera apply --eth-rpc-url "$rpc_url" --yes
 
 # 20. Cài drosera-operator
 cd ~
