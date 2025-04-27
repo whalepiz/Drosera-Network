@@ -109,8 +109,8 @@ sed -i '/whitelist = \[\]/d' drosera.toml
 # 14. Banner + Loading
 clear
 figlet -f big "PIZ - NODE"
-echo -e "${YELLOW}⌛ Đợi 10 phút đồng bộ...${NC}"
-loading_bar 600
+echo -e "${YELLOW}⌛ Đợi 8 phút đồng bộ...${NC}"
+loading_bar 480
 
 # 15. Apply trap lần 2
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
