@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Loading đẹp + Echo màu + Banner PIZ
+# Phiên bản: Auto Apply + Banner PIZ + Sửa .env đầy đủ
 # ========================
 
 # Định nghĩa màu sắc
@@ -21,8 +21,6 @@ loading_bar() {
   echo -e "\n${GREEN}✅ Hoàn thành đợi!${NC}"
 }
 
-# ========================
-
 # 1. Kiểm tra quyền sudo
 if sudo -v &>/dev/null; then
     echo -e "${GREEN}Bạn có quyền sudo.${NC}"
@@ -33,15 +31,12 @@ else
 fi
 
 # 2. Cập nhật hệ thống
-echo -e "${YELLOW}⚡ Đang cập nhật hệ thống...${NC}"
 $SUDO_CMD apt-get update && $SUDO_CMD apt-get upgrade -y
 
 # 3. Cài các gói cần thiết
-echo -e "${YELLOW}⚡ Đang cài đặt các gói cần thiết...${NC}"
-$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev ca-certificates gnupg -y
+$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev ca-certificates gnupg figlet -y
 
 # 4. Cài Docker
-echo -e "${YELLOW}⚡ Đang cài Docker...${NC}"
 if [ -n "$SUDO_CMD" ]; then
     $SUDO_CMD install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO_CMD gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -52,19 +47,16 @@ if [ -n "$SUDO_CMD" ]; then
 fi
 
 # 5. Cài CLI Tools
-echo -e "${YELLOW}⚡ Đang cài CLI Tools...${NC}"
 curl -L https://app.drosera.io/install | bash
 curl -L https://foundry.paradigm.xyz | bash
 curl -fsSL https://bun.sh/install | bash
 source ~/.bashrc
 
 # 6. Tạo Trap
-echo -e "${YELLOW}⚡ Tạo Trap Project...${NC}"
 mkdir -p ~/my-drosera-trap
 cd ~/my-drosera-trap
 
 # 7. Git config
-echo -e "${YELLOW}⚡ Cấu hình Git...${NC}"
 echo "Nhập GitHub Email của bạn:"
 read github_email
 echo "Nhập GitHub Username của bạn:"
@@ -79,113 +71,83 @@ bun install
 forge build
 
 # 9. Nhập PRIVATE_KEY và RPC_URL
-echo -e "${YELLOW}⚡ Nhập thông tin Blockchain...${NC}"
 echo "Nhập PRIVATE_KEY của bạn:"
 read private_key
 echo "Nhập RPC URL của bạn:"
 read rpc_url
 
-# 10. Export PRIVATE_KEY
 export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
 source ~/.bashrc
 
-# 11. Apply trap lần 1 (Auto Apply)
-echo -e "${YELLOW}⚡ Apply Trap lần 1...${NC}"
+# 10. Apply trap lần 1
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
-# 12. Check drosera.toml tồn tại
-cd ~/my-drosera-trap
-if [[ -f "drosera.toml" ]]; then
-    echo -e "${GREEN}✅ File drosera.toml đã tồn tại.${NC}"
-else
+# 11. Check drosera.toml
+if [[ ! -f "drosera.toml" ]]; then
     echo -e "${RED}❌ Không tìm thấy drosera.toml. Script dừng.${NC}"
     exit 1
 fi
 
-# 13. Hướng dẫn thao tác web
-echo -e "${YELLOW}➡️ Truy cập https://app.drosera.io/ để gửi Bloom Boost.${NC}"
-
+# 12. Hướng dẫn web
 while true; do
-    read -p "Bạn đã hoàn thành gửi Boost chưa? (N để tiếp tục / Y nếu chưa): " response
-    case $response in
-        [Nn]* ) break ;;
-        [Yy]* ) echo "Hãy hoàn thành trên web trước khi tiếp tục." ;;
-        * ) echo "Chỉ được nhập 'Y' hoặc 'N'." ;;
-    esac
+    read -p "Hoàn thành gửi Boost chưa? (N để tiếp tục / Y nếu chưa): " response
+    [[ "$response" =~ ^[Nn]$ ]] && break
+    echo "Hãy hoàn thành trên web trước khi tiếp tục."
 done
 
-# 14. drosera dryrun
 drosera dryrun
 
-# 15. Update whitelist
+# 13. Update whitelist
 echo "Nhập địa chỉ ví EVM Operator của bạn:"
 read operator_address
 
 echo "private_trap = true" >> drosera.toml
 echo "whitelist = [\"$operator_address\"]" >> drosera.toml
-
-# Xóa dòng whitelist = [] cũ
 sed -i '/whitelist = \[\]/d' drosera.toml
 
-echo -e "${GREEN}✅ Đã thêm whitelist vào drosera.toml và xoá whitelist = [] cũ.${NC}"
-
-# 16. Hiển thị Banner và Loading 10 phút
-if ! command -v figlet &> /dev/null
-then
-    echo -e "${YELLOW}⚡ Đang cài figlet để in banner đẹp...${NC}"
-    $SUDO_CMD apt install figlet -y
-fi
-
+# 14. Banner + Loading
 clear
-figlet -f big "PIZ"
-echo "============================================================="
-echo "Follow me on Twitter for updates and more: https://whalepiz"
-echo "============================================================="
-echo ""
-
-echo -e "${YELLOW}⌛ Đang chờ 10 phút để đồng bộ trap...${NC}"
+figlet -f big "PIZ - NODE"
+echo -e "${YELLOW}⌛ Đợi 10 phút đồng bộ...${NC}"
 loading_bar 600
 
-# 17. Apply lại trap lần 2
-echo -e "${YELLOW}⚡ Apply Trap lần 2...${NC}"
+# 15. Apply trap lần 2
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
-# 18. Cài drosera-operator
+# 16. Cài operator
 cd ~
-echo -e "${YELLOW}⬇️ Tải drosera-operator...${NC}"
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 $SUDO_CMD cp drosera-operator /usr/bin/
-drosera-operator --version
 
-# 19. Docker Image drosera-operator
+# 17. Docker Image operator
 $SUDO_CMD docker pull ghcr.io/drosera-network/drosera-operator:latest
 
-# 20. Mở firewall
+# 18. Mở firewall
 $SUDO_CMD ufw allow ssh
 $SUDO_CMD ufw allow 22
 $SUDO_CMD ufw allow 31313/tcp
 $SUDO_CMD ufw allow 31314/tcp
 $SUDO_CMD ufw allow 30304/tcp
 $SUDO_CMD ufw --force enable
-$SUDO_CMD ufw status
 
-# 21. Clone Drosera-Network + chỉnh .env
-cd ~
+# 19. Clone và chỉnh .env
+$SUDO_CMD rm -rf ~/Drosera-Network
 git clone https://github.com/whalepiz/Drosera-Network
 cd Drosera-Network
 cp .env.example .env
+sed -i "s/your_evm_private_key/$private_key/g" .env
+sed -i "s/your_actual_private_key/$private_key/g" .env
 
-sed -i "s/[yY][oO][uU][rR]_[eE][vV]_[pP]rivate_[kK]ey/$private_key/" .env
+read -p "IP Public VPS của bạn: " vps_ip
+sed -i "s/your_vps_public_ip/$vps_ip/g" .env
 
-echo "Nhập địa chỉ IP Public của VPS:"
-read vps_ip
-sed -i "s/[yY][oO][uU][rR]_[vV][pP]s_[pP]ublic_[iI]p/$vps_ip/" .env
+sed -i "s|https://ethereum-holesky-rpc.publicnode.com|$rpc_url|g" docker-compose.yaml
 
-# 22. docker compose
+# 20. Docker compose
 $SUDO_CMD docker compose up -d
 $SUDO_CMD docker compose down
 $SUDO_CMD docker compose up -d
 
-echo -e "${GREEN}✅ Hoàn tất cài đặt Drosera Trap + Operator!${NC}"
+echo -e "${GREEN}✅ Hoàn tất!${NC}"
