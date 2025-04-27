@@ -2,7 +2,7 @@
 
 # ========================
 # Script Cài Drosera Trap + Operator FULL AUTO
-# Phiên bản: Đã fix lỗi apply, drosera.toml, tối ưu hóa flow
+# Phiên bản: Chuẩn tách riêng drosera apply tay
 # ========================
 
 # 1. Kiểm tra quyền sudo
@@ -65,13 +65,34 @@ export DROSERA_PRIVATE_KEY="$private_key"
 echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
 source ~/.bashrc
 
-# 11. Apply lần 1 (bắt buộc tạo drosera.toml) - THÊM --yes
-drosera apply --eth-rpc-url "$rpc_url" --yes
+# 11. Hướng dẫn chạy drosera apply thủ công
+echo ""
+echo "⚡ Vui lòng CHẠY LỆNH SAU trong terminal để apply Trap:"
+echo ""
+echo "DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url"
+echo ""
+echo "➡️ Sau khi chạy lệnh và hoàn thành bước apply, hãy quay lại đây và nhấn N để tiếp tục."
+echo ""
 
-# 12. Quay về đúng thư mục trap
-cd ~/my-drosera-trap
+# 12. Dừng chờ xác nhận từ người dùng
+while true; do
+    read -p "Bạn đã hoàn thành drosera apply chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
+    case $response in
+        [Nn]* ) 
+            echo "Tiếp tục..."
+            break
+            ;;
+        [Yy]* ) 
+            echo "Hãy chạy lệnh apply trước khi tiếp tục."
+            ;;
+        * ) 
+            echo "Chỉ được nhập 'Y' hoặc 'N'."
+            ;;
+    esac
+done
 
 # 13. Check drosera.toml tồn tại
+cd ~/my-drosera-trap
 if [[ -f "drosera.toml" ]]; then
     echo "✅ File drosera.toml đã tồn tại."
 else
@@ -80,21 +101,21 @@ else
 fi
 
 # 14. Hướng dẫn thao tác web
-echo "➡️ Truy cập https://app.drosera.io/"
+echo "➡️ Tiếp theo, truy cập https://app.drosera.io/"
 echo "1. Kết nối ví => Traps Owned."
 echo "2. Gửi Holesky ETH (Send Bloom Boost)."
-echo "3. Sau khi xong, quay lại đây và nhấn 'N'."
+echo "3. Sau khi xong, quay lại đây và nhấn N để tiếp tục."
 
 # 15. Hỏi user đã xong chưa
 while true; do
-    read -p "Bạn đã làm xong trên web chưa? (N=Tiếp tục / Y=Chưa): " response
+    read -p "Bạn đã xong trên web chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
     case $response in
         [Nn]* ) 
             echo "Tiếp tục..."
             break
             ;;
         [Yy]* ) 
-            echo "Làm xong rồi hãy quay lại nhấn 'N' nhé!"
+            echo "Hãy hoàn thành trên web trước khi tiếp tục."
             ;;
         * ) 
             echo "Chỉ được nhập 'Y' hoặc 'N'."
@@ -120,8 +141,28 @@ for ((i=10; i>0; i--)); do
     sleep 60
 done
 
-# 19. Apply lại lần 2 - THÊM --yes
-drosera apply --eth-rpc-url "$rpc_url" --yes
+# 19. Apply lần 2
+echo ""
+echo "⚡ Bây giờ bạn cần tự chạy lại lệnh apply lần 2:"
+echo ""
+echo "DROSERA_PRIVATE_KEY=$private_key drosera apply --eth-rpc-url $rpc_url"
+echo ""
+
+while true; do
+    read -p "Bạn đã chạy lại apply lần 2 chưa? (Nhập N để tiếp tục / Y nếu chưa): " response
+    case $response in
+        [Nn]* ) 
+            echo "Tiếp tục..."
+            break
+            ;;
+        [Yy]* ) 
+            echo "Hãy chạy lại apply trước khi tiếp tục."
+            ;;
+        * ) 
+            echo "Chỉ được nhập 'Y' hoặc 'N'."
+            ;;
+    esac
+done
 
 # 20. Cài drosera-operator
 cd ~
