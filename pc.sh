@@ -42,16 +42,19 @@ if [ -n "$SUDO_CMD" ]; then
     $SUDO_CMD apt-get update && $SUDO_CMD apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
     $SUDO_CMD docker run hello-world
 fi
+
 # Cài Drosera CLI
 echo "Installing Drosera CLI..."
 curl -L https://app.drosera.io/install | bash
 sleep 3
+export PATH="$HOME/.drosera/bin:$PATH"  # Fix PATH
 source ~/.bashrc
 
 if command -v droseraup &> /dev/null; then
     echo "Running droseraup to complete Drosera installation..."
     droseraup
     sleep 3
+    export PATH="$HOME/.drosera/bin:$PATH"  # đảm bảo PATH lần nữa
     source ~/.bashrc
 else
     echo -e "${RED}❌ droseraup command not found after install.${NC}"
@@ -67,12 +70,14 @@ fi
 echo "Installing Foundry CLI..."
 curl -L https://foundry.paradigm.xyz | bash
 sleep 3
+export PATH="$HOME/.foundry/bin:$PATH"   # Fix PATH Foundry
 source ~/.bashrc
 
 if command -v foundryup &> /dev/null; then
     echo "Running foundryup to complete Foundry installation..."
     foundryup
     sleep 5
+    export PATH="$HOME/.foundry/bin:$PATH"  # đảm bảo PATH lần nữa
     source ~/.bashrc
 else
     echo -e "${RED}❌ foundryup command not found after install.${NC}"
@@ -85,14 +90,17 @@ if ! command -v forge &> /dev/null; then
 fi
 
 # Cài Bun CLI
+echo "Installing Bun CLI..."
 curl -fsSL https://bun.sh/install | bash
 sleep 3
+export PATH="$HOME/.bun/bin:$PATH"   # Fix PATH Bun
 source ~/.bashrc
 
 if ! command -v bun &> /dev/null; then
     echo -e "${RED}❌ Bun CLI installation failed.${NC}"
     exit 1
 fi
+
 # 6. Tạo Trap
 mkdir -p ~/my-drosera-trap
 cd ~/my-drosera-trap
@@ -125,11 +133,14 @@ if [[ ! -f "drosera.toml" ]]; then
     echo -e "${RED}❌ Không tìm thấy drosera.toml. Script dừng.${NC}"
     exit 1
 fi
+
 # 12. Hướng dẫn thao tác Send Bloom Boost
 clear
-echo -e "${YELLOW}➡️ Truy cập: https://app.drosera.io/ .${NC}"
-echo -e "${YELLOW}➡️ Nhấp vào Traps Owned.${NC}"
-echo -e "${YELLOW}➡️ Nhấp vào Send Bloom Boost để gửi Ethereum Holesky vào ví.${NC}"
+echo -e "${YELLOW}➡️ Hãy làm theo các bước sau đây:${NC}"
+echo -e "1. Truy cập vào Website: https://app.drosera.io/"
+echo -e "2. Kết nối ví EVM của bạn"
+echo -e "3. Nhấn vào Traps Owned"
+echo -e "4. Nhấn vào Send Bloom Boost rồi gửi Holesky ETH"
 while true; do
     read -p "Đã hoàn thành Send Bloom Boost? (N để tiếp tục / Y nếu chưa): " response
     [[ "$response" =~ ^[Nn]$ ]] && break
@@ -151,6 +162,7 @@ loading_bar 480
 
 # 15. Apply trap lần 2
 echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
+
 # 16. Cài operator
 cd ~
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
@@ -169,6 +181,7 @@ $SUDO_CMD ufw allow 30304/tcp
 $SUDO_CMD ufw --force enable
 
 # 19. Clone Drosera-Network và chỉnh .env
+[ -d "Drosera-Network" ] && rm -rf Drosera-Network    # Xóa thư mục cũ nếu có
 git clone https://github.com/whalepiz/Drosera-Network
 cd Drosera-Network
 cp .env.example .env
@@ -181,8 +194,7 @@ sed -i "s|https://ethereum-holesky-rpc.publicnode.com|$rpc_url|g" docker-compose
 
 # 20. Docker compose up
 $SUDO_CMD docker compose up -d
-$SUDO_CMD docker compose down
-$SUDO_CMD docker compose up -d
+
 # 22. Hướng dẫn Opti In sau cài
 echo -e "${YELLOW}➡️ Truy cập: https://app.drosera.io/ để thực hiện Opti In.${NC}"
 while true; do
