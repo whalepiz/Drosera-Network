@@ -133,7 +133,6 @@ $SUDO_CMD ufw allow 30304/tcp
 $SUDO_CMD ufw --force enable
 
 # 19. Clone và chỉnh .env
-$SUDO_CMD rm -rf ~/Drosera-Network
 git clone https://github.com/whalepiz/Drosera-Network
 cd Drosera-Network
 cp .env.example .env
@@ -151,3 +150,25 @@ $SUDO_CMD docker compose down
 $SUDO_CMD docker compose up -d
 
 echo -e "${GREEN}✅ Hoàn tất!${NC}"
+
+# 22. Hướng dẫn Opti In sau cài
+echo ""
+echo -e "${YELLOW}➡️ Bước tiếp theo:${NC}"
+echo "1. Truy cập vào Website: https://app.drosera.io/"
+echo "2. Kết nối ví EVM của bạn"
+echo "3. Nhấn vào Traps Owned"
+echo "4. Nhấn vào Opti In"
+echo ""
+
+while true; do
+    read -p "Bạn đã nhấn vào Opti In và thực hiện lệnh chưa? (N để tiếp tục / Y nếu chưa): " response
+    [[ "$response" =~ ^[Nn]$ ]] && break
+    echo "Hãy hoàn thành Opti In trên web trước khi tiếp tục."
+done
+
+# 23. Chúc mừng hoàn tất
+echo ""
+echo -e "${GREEN}🎉 CHÚC MỪNG BẠN ĐÃ HOÀN TẤT QUÁ TRÌNH CÀI ĐẶT NODE!${NC}"
+echo -e "${YELLOW}➡️ ĐỂ NODE HOẠT ĐỘNG TỐT VÀ HIỆN CÁC THANH MÀU XANH SẼ MẤT TỪ 1 TIẾNG ĐẾN 5 TIẾNG.${NC}"
+echo -e "${YELLOW}➡️ HÃY KIÊN NHẪN ĐỢI.${NC}"
+echo ""
