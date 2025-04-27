@@ -125,14 +125,22 @@ if [[ ! -f "drosera.toml" ]]; then
     echo -e "${RED}❌ Không tìm thấy drosera.toml. Script dừng.${NC}"
     exit 1
 fi
-# 12. Hướng dẫn thao tác Send Bloom Boost
+# 12. Hướng dẫn thao tác web
 clear
-echo -e "${YELLOW}➡️ Truy cập: https://app.drosera.io/ để Send Bloom Boost.${NC}"
+echo -e "${YELLOW}➡️ Hãy làm theo các bước sau đây:${NC}"
+echo -e "1. Truy cập vào Website: https://app.drosera.io/"
+echo -e "2. Kết nối ví EVM của bạn"
+echo -e "3. Nhấn vào Traps Owned"
+echo -e "4. Nhấn vào Send Bloom Boost rồi gửi Holesky ETH"
+
+echo ""
 while true; do
-    read -p "Đã hoàn thành Send Bloom Boost? (N để tiếp tục / Y nếu chưa): " response
+    read -p "Hoàn thành Send Bloom Boost chưa? (N để tiếp tục / Y nếu chưa): " response
     [[ "$response" =~ ^[Nn]$ ]] && break
-    echo "Hãy hoàn thành trên web trước khi tiếp tục."
+    echo "Hãy hoàn thành Send Bloom Boost trên web trước khi tiếp tục."
 done
+
+drosera dryrun
 
 # 13. Update whitelist
 read -p "Nhập địa chỉ ví EVM Operator của bạn: " operator_address
