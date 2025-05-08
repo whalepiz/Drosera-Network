@@ -47,7 +47,8 @@ nano drosera.toml
    ```
    drosera_team = "https://relayer.testnet.drosera.io/
    ```
-   
+
+# Run the command again
 ```
 cd && cd my-drosera-trap && source /root/.bashrc && drosera dryrun
 
