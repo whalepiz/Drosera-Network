@@ -42,7 +42,7 @@ nano drosera.toml
    ```
    drosera_rpc = "http://seed-node.testnet.drosera.io"
    ```
-   With:
+   Replace with:
 
    ```
    drosera_team = "https://relayer.testnet.drosera.io/
