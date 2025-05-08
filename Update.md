@@ -45,7 +45,7 @@ nano drosera.toml
    Replace with:
 
    ```
-   drosera_team = "https://relayer.testnet.drosera.io/
+   drosera_team = "https://relayer.testnet.drosera.io/"
    ```
 
 # Run the command again
