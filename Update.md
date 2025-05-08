@@ -1,12 +1,23 @@
-```
+# How to Upgrade Your Drosera Node
 
+# 1. Stop your Docker
+
+## If using Docker:
+
+```
 cd ~
 cd ~/Drosera-Network
 docker compose down -v
 ```
+## If using systemD:
+```sudo systemctl stop drosera
+sudo systemctl disable drosera
+```
 ```
 pkill -f drosera-operator
 ```
+
+# 2. Update Drosera:
 ```
 cd ~
 curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
@@ -14,8 +25,11 @@ tar -xvf drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz
 sudo cp drosera-operator /usr/bin
 drosera-operator --version```
 
+# 3. Install Docker Image
+
 ```docker pull ghcr.io/drosera-network/drosera-operator:latest```
 
+# 4. Apply New RPC:
 ```cd && cd my-drosera-trap
 sed -i '/^drosera_rpc =/d' drosera.toml && sed -i '2i drosera_team = "https://relayer.testnet.drosera.io/"' drosera.toml```
 
