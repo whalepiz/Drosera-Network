@@ -45,9 +45,11 @@ nano drosera.toml
    With:
 
    ```
-   drosera_team = "https://relayer.testnet.drosera.io/"
+   drosera_team = "https://relayer.testnet.drosera.io/
    ```
-```cd && cd my-drosera-trap && source /root/.bashrc && drosera dryrun
+   
+```
+cd && cd my-drosera-trap && source /root/.bashrc && drosera dryrun
 
 ```
 
