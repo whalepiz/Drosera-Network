@@ -31,10 +31,22 @@ docker pull ghcr.io/drosera-network/drosera-operator:latest
 
 # 4. Apply New RPC:
 
-```cd && cd my-drosera-trap
-sed -i '/^drosera_rpc =/d' drosera.toml && sed -i '2i drosera_team = "https://relayer.testnet.drosera.io/"' drosera.toml
-```
+1. Navigate to your Drosera configuration directory:
 
+```cd ~
+cd my-drosera-trap
+nano drosera.toml
+```
+2. Update the drosera_rpc in the file: Replace:
+
+   ```
+   drosera_rpc = "http://seed-node.testnet.drosera.io"
+   ```
+   With:
+
+   ```
+   drosera_team = "https://relayer.testnet.drosera.io/"
+   ```
 ```cd && cd my-drosera-trap && source /root/.bashrc && drosera dryrun
 
 ```
