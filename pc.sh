@@ -171,7 +171,7 @@ echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
 
 # Install operator
 cd ~
-curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 $SUDO_CMD cp drosera-operator /usr/bin/
 
