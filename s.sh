@@ -1,261 +1,589 @@
 #!/bin/bash
 
-# ========================
-# Drosera Trap + 2 Operators FULL AUTO Installation Script
-# ========================
 
-# Define colors
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+# Ensure we start in ~/Drosera
+cd ~/Drosera || { echo "Error: Cannot change to ~/Drosera directory."; exit 1; }
 
-# Nice loading bar
-loading_bar() {
-  duration=$1
-  for ((i=1; i<=$duration; i++)); do
-    printf "\r⏳ Waiting %s seconds..." "$i"
-    sleep 1
-  done
-  echo -e "\n${GREEN}✅ Waiting completed!${NC}"
+# Function to check command success
+check_status() {
+    if [[ $? -ne 0 ]]; then
+        echo "Error: $1 failed. Exiting."
+        exit 1
+    fi
 }
 
-# Check sudo permission
-if sudo -v &>/dev/null; then
-    echo -e "${GREEN}You have sudo permission.${NC}"
-    SUDO_CMD="sudo"
+# Function to validate private key
+validate_private_key() {
+    local private_key=$1
+    if [[ ! "$private_key" =~ ^[0-9a-fA-F]{64}$ ]]; then
+        echo "Error: Invalid private key format. Must be 64 hexadecimal characters."
+        exit 1
+    fi
+}
+
+# Clean up previous script runs
+echo "Cleaning up previous script runs..."
+pkill -f drosera-operator
+sudo docker compose -f ~/Drosera-Network/docker-compose.yaml down -v 2>/dev/null
+sudo docker WELCOME_TO_DROSERA stop drosera-node1 drosera-node2 2>/dev/null
+sudo docker rm drosera-node1 drosera-node2 2>/dev/null
+sudo rm -rf ~/my-drosera-trap ~/Drosera-Network ~/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz /usr/bin/drosera-operator ~/drosera-operator
+check_status "Cleanup"
+source /root/.bashrc
+
+# Install figlet for ASCII art if not present
+if ! command -v figlet &> /dev/null; then
+    echo "Installing figlet for ASCII art..."
+    sudo apt-get update && sudo apt-get install -y figlet
+    check_status "figlet installation"
+fi
+source /root/.bashrc
+
+# Clear terminal
+clear
+
+# Display Crypton header
+figlet -f big "Crypton"
+
+# Info line with color (optional, if terminal supports ANSI colors)
+echo -e "\e[36m=============================================================\e[0m"
+echo -e "Follow me on Twitter for updates and more: \e[4;34mhttps://x.com/0xCrypton_\e[0m"
+echo -e "\e[36m=============================================================\e[0m"
+echo ""
+
+# Welcome message
+echo -e "\e[1m🚀 Starting Drosera Network Testnet Setup for Two Operators\e[0m"
+echo "💡 Make sure both Holesky ETH wallets are funded before proceeding."
+echo ""
+
+# Prompt for required inputs
+read -p "🔐 Enter your first EVM wallet public address (Operator 1) " OPERATOR1_PRIVATE_KEY
+read -p "🏷️ Enter your first EVM wallet public address (Operator 1): " OPERATOR1_ADDRESS
+read -p "🔐Enter your second EVM wallet private key (Operator 2): " OPERATOR2_PRIVATE_KEY
+read -p "🏷️ Enter your second EVM wallet public address (Operator 2): " OPERATOR2_ADDRESS
+# Auto-detect VPS public IP
+echo "Detecting VPS public IP..."
+VPS_IP=$(curl -s ifconfig.me || curl -s icanhazip.com)
+if [[ -z "$VPS_IP" ]]; then
+    read -p "Could not detect VPS public IP. Please enter it manually: " VPS_IP
+fi
+echo "VPS public IP: $VPS_IP"
+read -p "Enter your Ethereum Holesky RPC URL (from Alchemy/QuickNode, or press Enter to use default): " ETH_RPC_URL
+if [[ -z "$ETH_RPC_URL" ]]; then
+    ETH_RPC_URL="https://ethereum-holesky-rpc.publicnode.com"
+fi
+read -p "Enter your GitHub email: " GITHUB_EMAIL
+read -p "Enter your GitHub username: " GITHUB_USERNAME
+
+# Step 1: Update and Install Dependencies
+echo "Step 1: Updating system and installing dependencies..."
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev -y
+check_status "Dependency installation"
+source /root/.bashrc
+
+# Step 2: Install Docker (if not already installed)
+echo "Step 2: Checking Docker installation..."
+if command -v docker &> /dev/null; then
+    echo "Docker is already installed. Skipping installation."
 else
-    echo -e "${YELLOW}You DO NOT have sudo permission.${NC}"
-    SUDO_CMD=""
+    echo "Installing Docker..."
+    sudo apt update -y && sudo apt upgrade -y
+    for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+    sudo apt-get update
+    sudo apt-get install ca-certificates curl gnupg
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt update -y && sudo apt upgrade -y
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+    sudo docker run hello-world
+    check_status "Docker installation"
 fi
+source /root/.bashrc
 
-# Update and install necessary packages
-$SUDO_CMD apt-get update && $SUDO_CMD apt-get upgrade -y
-$SUDO_CMD apt install curl ufw iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip ca-certificates gnupg figlet -y
-
-# Install Docker
-if [ -n "$SUDO_CMD" ]; then
-    $SUDO_CMD install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO_CMD gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    $SUDO_CMD chmod a+r /etc/apt/keyrings/docker.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | $SUDO_CMD tee /etc/apt/sources.list.d/docker.list > /dev/null
-    $SUDO_CMD apt-get update && $SUDO_CMD apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-    $SUDO_CMD docker run hello-world
-fi
+# Step 3: Install CLIs (Drosera, Foundry, Bun)
+echo "Step 3: Installing Drosera, Foundry, and Bun CLIs..."
 
 # Install Drosera CLI
 echo "Installing Drosera CLI..."
-curl -L https://app.drosera.io/install | bash
-sleep 3
-export PATH="$HOME/.drosera/bin:$PATH"  # Fix PATH
-source ~/.bashrc
-
-if command -v droseraup &> /dev/null; then
-    echo "Running droseraup to complete Drosera installation..."
-    droseraup
+max_attempts=3
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Installing Drosera CLI..."
+    curl -L https://app.drosera.io/install | bash
     sleep 3
-    export PATH="$HOME/.drosera/bin:$PATH"  # Ensure PATH again
-    source ~/.bashrc
-else
-    echo -e "${RED}❌ droseraup command not found after install.${NC}"
-    exit 1
-fi
-
-if ! command -v drosera &> /dev/null; then
-    echo -e "${RED}❌ Drosera CLI installation failed even after droseraup.${NC}"
-    exit 1
-fi
+    source /root/.bashrc
+    sleep 2
+    source /root/.bashrc
+    sleep 2
+    
+    if [[ -d "/root/.drosera/bin" ]]; then
+        export PATH=$PATH:/root/.drosera/bin
+        echo 'export PATH=$PATH:/root/.drosera/bin' >> /root/.bashrc
+        source /root/.bashrc
+        sleep 2
+    fi
+    
+    if command -v droseraup &> /dev/null; then
+        droseraup
+        source /root/.bashrc
+        sleep 2
+        if command -v drosera &> /dev/null; then
+            echo "Success: Drosera CLI installed."
+            break
+        else
+            echo "Drosera CLI not fully installed."
+        fi
+    else
+        echo "droseraup command not found."
+        echo "Current PATH: $PATH"
+    fi
+    
+    ((attempt++))
+    if [[ $attempt -le $max_attempts ]]; then
+        echo "Retrying in 10 seconds..."
+        sleep 10
+    else
+        echo "Error: Failed to install Drosera CLI after $max_attempts attempts."
+        exit 1
+    fi
+done
+check_status "Drosera CLI installation"
+source /root/.bashrc
 
 # Install Foundry CLI
 echo "Installing Foundry CLI..."
-curl -L https://foundry.paradigm.xyz | bash
-sleep 3
-export PATH="$HOME/.foundry/bin:$PATH"   # Fix PATH Foundry
-source ~/.bashrc
-
-if command -v foundryup &> /dev/null; then
-    echo "Running foundryup to complete Foundry installation..."
-    foundryup
-    sleep 5
-    export PATH="$HOME/.foundry/bin:$PATH"  # Ensure PATH again
-    source ~/.bashrc
-else
-    echo -e "${RED}❌ foundryup command not found after install.${NC}"
-    exit 1
-fi
-
-if ! command -v forge &> /dev/null; then
-    echo -e "${RED}❌ Foundry CLI installation failed even after foundryup.${NC}"
-    exit 1
-fi
+max_attempts=3
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Installing Foundry CLI..."
+    curl -L https://foundry.paradigm.xyz | bash
+    sleep 3
+    source /root/.bashrc
+    sleep 2
+    source /root/.bashrc
+    sleep 2
+    
+    if [[ -d "/root/.foundry/bin" ]]; then
+        export PATH=$PATH:/root/.foundry/bin
+        echo 'export PATH=$PATH:/root/.foundry/bin' >> /root/.bashrc
+        source /root/.bashrc
+        sleep 2
+    fi
+    
+    if command -v foundryup &> /dev/null; then
+        foundryup
+        source /root/.bashrc
+        sleep 2
+        if command -v forge &> /dev/null; then
+            echo "Success: Foundry CLI installed."
+            break
+        else
+            echo "Foundry CLI not fully installed."
+        fi
+    else
+        echo "foundryup command not found."
+        echo "Current PATH: $PATH"
+    fi
+    
+    ((attempt++))
+    if [[ $attempt -le $max_attempts ]]; then
+        echo "Retrying in 10 seconds..."
+        sleep 10
+    else
+        echo "Error: Failed to install Foundry CLI after $max_attempts attempts."
+        exit 1
+    fi
+done
+check_status "Foundry CLI installation"
+source /root/.bashrc
 
 # Install Bun CLI
 echo "Installing Bun CLI..."
-curl -fsSL https://bun.sh/install | bash
-sleep 3
-export PATH="$HOME/.bun/bin:$PATH"   # Fix PATH Bun
-source ~/.bashrc
+max_attempts=3
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Installing Bun CLI..."
+    curl -fsSL https://bun.sh/install | bash
+    sleep 3
+    source /root/.bashrc
+    sleep 2
+    source /root/.bashrc
+    sleep 2
+    
+    if [[ -d "/root/.bun/bin" ]]; then
+        export PATH=$PATH:/root/.bun/bin
+        echo 'export PATH=$PATH:/root/.bun/bin' >> /root/.bashrc
+        source /root/.bashrc
+        sleep 2
+    fi
+    
+    if command -v bun &> /dev/null; then
+        echo "Success: Bun CLI installed."
+        break
+    else
+        echo "bun command not found."
+        echo "Current PATH: $PATH"
+    fi
+    
+    ((attempt++))
+    if [[ $attempt -le $max_attempts ]]; then
+        echo "Retrying in 10 seconds..."
+        sleep 10
+    else
+        echo "Error: Failed to install Bun CLI after $max_attempts attempts."
+        exit 1
+    fi
+done
+check_status "Bun CLI installation"
+source /root/.bashrc
 
-if ! command -v bun &> /dev/null; then
-    echo -e "${RED}❌ Bun CLI installation failed.${NC}"
-    exit 1
-fi
-
-# Create Trap
-mkdir -p ~/my-drosera-trap
-cd ~/my-drosera-trap
-
-# Git config
-read -p "Enter your GitHub Email: " github_email
-read -p "Enter your GitHub Username: " github_username
-
-git config --global user.email "$github_email"
-git config --global user.name "$github_username"
-
-# Init project
+# Step 4: Trap Setup
+echo "Step 4: Setting up and deploying Trap..."
+mkdir ~/my-drosera-trap
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+git config --global user.email "$GITHUB_EMAIL"
+git config --global user.name "$GITHUB_USERNAME"
 forge init -t drosera-network/trap-foundry-template
+check_status "Forge init"
+curl -fsSL https://bun.sh/install | bash
+source /root/.bashrc
 bun install
 forge build
+check_status "Forge build"
+source /root/.bashrc
 
-# Enter PRIVATE_KEY and RPC_URL
-read -p "Enter your PRIVATE_KEY: " private_key
-read -p "Enter your RPC URL: " rpc_url
+# Deploy Trap
+echo "Deploying Trap..."
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+max_attempts=20
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Deploying Trap..."
+    DROSERA_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY drosera apply
+    if [[ $? -eq 0 ]]; then
+        echo "Success: Trap deployed."
+        break
+    else
+        echo "Failed to deploy Trap."
+        ((attempt++))
+        if [[ $attempt -le $max_attempts ]]; then
+            echo "Retrying in 60 seconds..."
+            sleep 60
+        else
+            echo "Error: Failed to deploy Trap after $max_attempts attempts."
+            exit 1
+        fi
+    fi
+done
+check_status "Trap deployment"
+source /root/.bashrc
 
-export DROSERA_PRIVATE_KEY="$private_key"
-echo "export DROSERA_PRIVATE_KEY=\"$private_key\"" >> ~/.bashrc
-source ~/.bashrc
+# Step 4.1: Extract Trap Address from drosera.toml
+echo "Step 4.1: Extracting Trap Address from drosera.toml..."
+TRAP_ADDRESS=$(awk '/\[traps\.mytrap\]/ {p=1} p && /address =/ {print $3; exit}' ~/my-drosera-trap/drosera.toml | tr -d '"')
+if [[ -z "$TRAP_ADDRESS" || ! "$TRAP_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]; then
+    echo "Error: Failed to extract a valid Trap Address from drosera.toml."
+    read -p "Enter a valid Trap Config address (e.g., 0x1234567890abcdef1234567890abcdef12345678): " TRAP_ADDRESS
+    if [[ ! "$TRAP_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]; then
+        echo "Error: Invalid Trap Config address entered. Exiting."
+        exit 1
+    fi
+fi
+echo "Trap Address extracted: $TRAP_ADDRESS"
+sleep 3
+source /root/.bashrc
 
-# First trap apply
-echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
-
-# Check drosera.toml
-if [[ ! -f "drosera.toml" ]]; then
-    echo -e "${RED}❌ drosera.toml not found. Script stops.${NC}"
+# Step 4.2: Confirm Send Bloom
+echo "Please go to https://app.drosera.io/, open your Trap ($TRAP_ADDRESS), and click 'Send Bloom Boost' to deposit some Holesky ETH."
+read -p "Have you completed the Send Bloom on https://app.drosera.io/? (y/n): " bloom_confirmed
+if [[ "$bloom_confirmed" != "y" ]]; then
+    echo "Error: Send Bloom not confirmed. Exiting."
     exit 1
 fi
+echo "Send Bloom confirmed."
+sleep 3
+source /root/.bashrc
 
-# Instructions for sending Bloom Boost
-clear
-echo -e "${YELLOW}➡️ Please follow these steps:${NC}"
-echo -e "1. Visit: https://app.drosera.io/"
-echo -e "2. Connect your EVM wallet"
-echo -e "3. Click on Traps Owned"
-echo -e "4. Click Send Bloom Boost and send Holesky ETH"
-while true; do
-    read -p "Have you completed Send Bloom Boost? (N Completed / Y Not Yet): " response
-    [[ "$response" =~ ^[Nn]$ ]] && break
-    echo "Please complete it on the website before continuing."
-done
-
-# Update whitelist
-read -p "Enter your EVM Wallet Address: " operator_address
-
-echo "private_trap = true" >> drosera.toml
-echo "whitelist = [\"$operator_address\"]" >> drosera.toml
+# Step 5: Whitelist Operators
+echo "Step 5: Whitelisting Operators..."
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+# Remove existing whitelist line
 sed -i '/whitelist = \[\]/d' drosera.toml
-
-# Banner + Loading
-clear
-figlet -f big "PIZ - NODE"
-echo "============================================================="
-echo "Follow me on Twitter for updates and more: https://x.com/whalepiz"
-echo "Join the Telegram group: https://t.me/Nexgenexplore"
-echo -e "${PURPLE}💎Donate (Wallet EVM - BNB,ETH,USDT): 0x3192b8D1f19E8914BD5Bf52941Ac704455151475 ${NC}"
-echo "============================================================="
-echo -e "${YELLOW}⌛ Waiting 8 minutes for synchronization...${NC}"
-loading_bar 480
-
-# Second trap apply
-echo "ofc" | drosera apply --eth-rpc-url "$rpc_url"
-
-# Install operator
-cd ~
-curl -LO https://github.com/drosera-network/releases/releases/download/v1.16.2/drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
-tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
-$SUDO_CMD cp drosera-operator /usr/bin/
-
-# Docker Image operator
-$SUDO_CMD docker pull ghcr.io/drosera-network/drosera-operator:latest
-
-# Register operator node (First Operator)
-echo -e "${GREEN}Registering First Operator Node...${NC}"
-drosera-operator register --eth-rpc-url "$rpc_url" --eth-private-key "$private_key"
-
-# Create directories and configs for second operator
-echo -e "${GREEN}Setting up second operator...${NC}"
-mkdir -p ~/drosera-operator2
-cd ~/drosera-operator2
-
-# Create config file for second operator
-cat <<EOF > config.toml
-eth_rpc_url = "$rpc_url"
-eth_private_key = "$private_key"
-data_dir = "$HOME/drosera-operator2/data"
+check_status "Removing existing whitelist from drosera.toml"
+# Append new whitelist without extra spaces
+cat << EOF >> drosera.toml
+private_trap = true
+whitelist = ["$OPERATOR1_ADDRESS","$OPERATOR2_ADDRESS"]
 EOF
-
-# Open firewall for both operators
-$SUDO_CMD ufw allow ssh
-$SUDO_CMD ufw allow 22
-$SUDO_CMD ufw allow 31313/tcp
-$SUDO_CMD ufw allow 31314/tcp
-$SUDO_CMD ufw allow 31315/tcp  # Additional port for second operator
-$SUDO_CMD ufw allow 31316/tcp  # Additional port for second operator
-$SUDO_CMD ufw allow 30304/tcp
-$SUDO_CMD ufw allow 30305/tcp  # Additional port for second operator
-$SUDO_CMD ufw --force enable
-
-# Clone Drosera-Network and edit .env for first operator
-[ -d "Drosera-Network" ] && rm -rf Drosera-Network    # Remove old folder if exists
-git clone https://github.com/whalepiz/Drosera-Network
-cd Drosera-Network
-cp .env.example .env
-sed -i "s/your_evm_private_key/$private_key/g" .env
-sed -i "s/your_actual_private_key/$private_key/g" .env
-
-read -p "Your VPS Public IP: " vps_ip
-sed -i "s/your_vps_public_ip/$vps_ip/g" .env
-sed -i "s|https://ethereum-holesky-rpc.publicnode.com|$rpc_url|g" docker-compose.yaml
-
-# Docker compose up for first operator
-$SUDO_CMD docker compose up -d
-
-# Set up second operator
-cd ~
-mkdir -p Drosera-Network-Operator2
-cd Drosera-Network-Operator2
-git clone https://github.com/whalepiz/Drosera-Network .
-cp .env.example .env
-sed -i "s/your_evm_private_key/$private_key/g" .env
-sed -i "s/your_actual_private_key/$private_key/g" .env
-sed -i "s/your_vps_public_ip/$vps_ip/g" .env
-
-# Modify ports in docker-compose.yaml for second operator to avoid conflicts
-sed -i "s/31313:31313/31315:31313/g" docker-compose.yaml
-sed -i "s/31314:31314/31316:31314/g" docker-compose.yaml
-sed -i "s/30304:30304/30305:30304/g" docker-compose.yaml
-sed -i "s|ghcr.io/drosera-network/drosera-operator:latest|ghcr.io/drosera-network/drosera-operator:latest|g" docker-compose.yaml
-sed -i "s|https://ethereum-holesky-rpc.publicnode.com|$rpc_url|g" docker-compose.yaml
-
-# Docker compose up for second operator
-$SUDO_CMD docker compose up -d
-
-# Instructions for Opti In after install
-echo -e "${YELLOW}➡️ Please follow these steps to perform Opti In:${NC}"
-echo -e "1. Visit: https://app.drosera.io/"
-echo -e "2. Connect your EVM wallet"
-echo -e "3. Click on Traps Owned"
-echo -e "4. Click Opti In to confirm the operation"
-while true; do
-    read -p "Have you clicked Opti In? (N Completed / Y Not Yet): " response
-    [[ "$response" =~ ^[Nn]$ ]] && break
-    echo "Please complete it on the website before continuing."
+check_status "Appending new whitelist to drosera.toml"
+# Add delay to handle ConfigUpdateCooldownNotElapsed
+echo "Waiting 60 seconds to ensure cooldown period has elapsed..."
+sleep 60
+echo "Updating Trap configuration..."
+max_attempts=10
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Updating Trap configuration..."
+    DROSERA_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY drosera apply
+    if [[ $? -eq 0 ]]; then
+        echo "Success: Trap configuration updated."
+        break
+    else
+        echo "Failed to update Trap configuration."
+        ((attempt++))
+        if [[ $attempt -le $max_attempts ]]; then
+            echo "Retrying in 120 seconds..."
+            sleep 120
+        else
+            echo "Error: Failed to update Trap configuration after $max_attempts attempts."
+            exit 1
+        fi
+    fi
 done
+check_status "Trap configuration update"
+source /root/.bashrc
 
-# Congratulations
-echo ""
-echo -e "${GREEN}🎉 Congratulations, you have completed the installation of 2 Operators!${NC}"
-echo -e "${YELLOW}➡️ For the nodes to work stably and see green bars, please patiently wait between 3 to 10 hours.${NC}"
-echo -e "${YELLOW}➡️ You can check the logs of both operators with these commands:${NC}"
-echo -e "${PURPLE}First operator logs: sudo docker compose -f ~/Drosera-Network/docker-compose.yaml logs -f${NC}"
-echo -e "${PURPLE}Second operator logs: sudo docker compose -f ~/Drosera-Network-Operator2/docker-compose.yaml logs -f${NC}"
+# Step 6: Install Operator CLI
+echo "Step 6: Installing Operator CLI and pulling Docker image..."
+cd ~ || true
+curl -LO https://github.com/drosera-network/releases/releases/download/v1.17.1/drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz || true
+sleep 3
+tar -xvf drosera-operator-v1.17.1-x86_64-unknown-linux-gnu.tar.gz || true
+sleep 3
+drosera-operator --version || true
+sleep 3
+sudo cp drosera-operator /usr/bin || true
+sleep 3
+sudo chmod +x /usr/bin/drosera-operator || true
+sleep 3
+export PATH=$PATH:/usr/bin
+source /root/.bashrc || true
+sleep 3
+drosera-operator || true
+sleep 3
+docker pull ghcr.io/drosera-network/drosera-operator:latest || true
+sleep 3
+source /root/.bashrc || true
+sleep 3
+sed -i '/^drosera_\(rpc\|team\) =/d' drosera.toml && sed -i '2i drosera_team = "https://relayer.testnet.drosera.io/"' drosera.toml
+
+
+# Step 7: Register Operators
+echo "Step 7: Registering Operators..."
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+
+# Register Operator 1
+echo "Attempting to register Operator 1..."
+max_attempts=3
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Registering Operator 1..."
+    drosera-operator register --eth-rpc-url "$ETH_RPC_URL" --eth-private-key "$OPERATOR1_PRIVATE_KEY" 2>&1 | tee /tmp/register_output.txt
+    if [[ $? -eq 0 || $(cat /tmp/register_output.txt) =~ "OperatorAlreadyRegistered" ]]; then
+        echo "Success: Operator 1 registered or already registered."
+        rm -f /tmp/register_output.txt
+        break
+    else
+        echo "Failed to register Operator 1."
+        ((attempt++))
+        if [[ $attempt -le $max_attempts ]]; then
+            echo "Retrying in 30 seconds..."
+            sleep 30
+        else
+            echo "Error: Failed to register Operator 1 after $max_attempts attempts. Exiting."
+            rm -f /tmp/register_output.txt
+            exit 1
+        fi
+    fi
+done
+sleep 3
+source /root/.bashrc
+
+# Register Operator 2
+echo "Attempting to register Operator 2..."
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Registering Operator 2..."
+    drosera-operator register --eth-rpc-url "$ETH_RPC_URL" --eth-private-key "$OPERATOR2_PRIVATE_KEY" 2>&1 | tee /tmp/register_output.txt
+    if [[ $? -eq 0 || $(cat /tmp/register_output.txt) =~ "OperatorAlreadyRegistered" ]]; then
+        echo "Success: Operator 2 registered or already registered."
+        rm -f /tmp/register_output.txt
+        break
+    else
+        echo "Failed to register Operator 2."
+        ((attempt++))
+        if [[ $attempt -le $max_attempts ]]; then
+            echo "Retrying in 30 seconds..."
+            sleep 30
+        else
+            echo "Error: Failed to register Operator 2 after $max_attempts attempts. Exiting."
+            rm -f /tmp/register_output.txt
+            exit 1
+        fi
+    fi
+done
+sleep 3
+source /root/.bashrc
+
+# Step 8: Opt-in Operators
+echo "Step 8: Opting in Operators..."
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+
+# Opt-in Operator 1 (manual via website)
+echo "Please go to https://app.drosera.io/, log in with Operator 1 address ($OPERATOR1_ADDRESS), find your Trap ($TRAP_ADDRESS) in the dashboard, and click the 'Optin' button."
+read -p "Have you completed the Optin for Operator 1 on https://app.drosera.io/? (y/n): " optin1_confirmed
+if [[ "$optin1_confirmed" != "y" ]]; then
+    echo "Error: Optin for Operator 1 not confirmed. Exiting."
+    exit 1
+fi
+echo "Operator 1 opt-in confirmed."
+sleep 3
+source /root/.bashrc
+
+# Validate Operator 2 private key
+echo "Validating Operator 2 private key..."
+if [[ ! "$OPERATOR2_PRIVATE_KEY" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    echo "Error: Invalid Operator 2 private key format. Must be 64 hexadecimal characters."
+    read -p "Enter a valid Operator 2 private key: " OPERATOR2_PRIVATE_KEY
+    if [[ ! "$OPERATOR2_PRIVATE_KEY" =~ ^[0-9a-fA-F]{64}$ ]]; then
+        echo "Error: Still invalid Operator 2 private key. Exiting."
+        exit 1
+    fi
+fi
+echo "Operator 2 private key is valid."
+sleep 3
+
+# Opt-in Operator 2 (via code)
+echo "Attempting to opt-in Operator 2..."
+max_attempts=5
+attempt=1
+while [[ $attempt -le $max_attempts ]]; do
+    echo "Attempt $attempt/$max_attempts: Opting in Operator 2..."
+    drosera-operator optin --eth-rpc-url "$ETH_RPC_URL" --eth-private-key "$OPERATOR2_PRIVATE_KEY" --trap-config-address "$TRAP_ADDRESS"
+    if [[ $? -eq 0 ]]; then
+        echo "Success: Operator 2 opted in."
+        break
+    else
+        echo "Failed to opt-in Operator 2."
+        ((attempt++))
+        if [[ $attempt -le $max_attempts ]]; then
+            echo "Retrying in 15 seconds..."
+            sleep 15
+        else
+            echo "Error: Failed to opt-in Operator 2 after $max_attempts attempts. Exiting."
+            exit 1
+        fi
+    fi
+done
+sleep 3
+source /root/.bashrc
+
+# Step 9: Install Docker Image
+echo "Step 9: Pulling Drosera Operator Docker image..."
+docker pull ghcr.io/drosera-network/drosera-operator:latest
+check_status "Docker image pull"
+source /root/.bashrc
+
+# Step 10: Open Ports
+echo "Step 10: Opening firewall ports..."
+sudo ufw allow ssh
+sudo ufw allow 22
+sudo ufw allow 31313/tcp
+sudo ufw allow 31314/tcp
+sudo ufw allow 31315/tcp
+sudo ufw allow 31316/tcp
+sudo ufw enable
+check_status "Firewall configuration"
+source /root/.bashrc
+
+# Step 11: Configure and Run Operators (Docker Method)
+echo "Step 11: Configuring and running Operators using Docker..."
+mkdir -p ~/Drosera-Network
+cd ~/Drosera-Network || { echo "Error: Cannot change to ~/Drosera-Network directory."; exit 1; }
+
+# Create .env file with direct variable substitution
+echo "Creating .env file..."
+cat << EOF > .env
+ETH_PRIVATE_KEY=$OPERATOR1_PRIVATE_KEY
+ETH_PRIVATE_KEY2=$OPERATOR2_PRIVATE_KEY
+VPS_IP=$VPS_IP
+P2P_PORT1=31313
+SERVER_PORT1=31314
+P2P_PORT2=31315
+SERVER_PORT2=31316
+EOF
+if [[ $? -eq 0 ]]; then
+    echo ".env file created successfully."
+else
+    echo "Warning: Failed to create .env file, continuing..."
+fi
+sleep 3
+
+# Create docker-compose.yaml file with direct variable substitution
+echo "Creating docker-compose.yaml file..."
+cat << EOF > docker-compose.yaml
+version: '3'
+services:
+  drosera1:
+    image: ghcr.io/drosera-network/drosera-operator:latest
+    container_name: drosera-node1
+    ports:
+      - "31313:31313"
+      - "31314:31314"
+    volumes:
+      - drosera_data1:/data
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31313 --server-port 31314 --eth-rpc-url $ETH_RPC_URL --eth-backup-rpc-url https://holesky.drpc.org --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 --eth-private-key $OPERATOR1_PRIVATE_KEY --listen-address 0.0.0.0 --network-external-p2p-address $VPS_IP --disable-dnr-confirmation true
+    restart: always
+  drosera2:
+    image: ghcr.io/drosera-network/drosera-operator:latest
+    container_name: drosera-node2
+    ports:
+      - "31315:31315"
+      - "31316:31316"
+    volumes:
+      - drosera_data2:/data
+    command: node --db-file-path /data/drosera.db --network-p2p-port 31315 --server-port 31316 --eth-rpc-url $ETH_RPC_URL --eth-backup-rpc-url https://holesky.drpc.org --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 --eth-private-key $OPERATOR2_PRIVATE_KEY --listen-address 0.0.0.0 --network-external-p2p-address $VPS_IP --disable-dnr-confirmation true
+    restart: always
+volumes:
+  drosera_data1:
+  drosera_data2:
+EOF
+if [[ $? -eq 0 ]]; then
+    echo "docker-compose.yaml file created successfully."
+else
+    echo "Warning: Failed to create docker-compose.yaml file, continuing..."
+fi
+sleep 3
+
+# Run docker compose
+echo "Starting Docker containers..."
+docker compose up -d || { echo "Warning: Failed to start Docker containers, continuing..."; true; }
+sleep 3
+source /root/.bashrc
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+
+# Step 12: Restart and Dryrun Node
+echo "Step 12: Restarting node and running dryrun to fetch blocks..."
+pkill -f drosera-operator || { echo "Warning: Failed to stop drosera-operator processes, continuing..."; true; }
+sleep 3
+source /root/.bashrc
+cd ~/my-drosera-trap || { echo "Error: Cannot change to ~/my-drosera-trap directory."; exit 1; }
+source /root/.bashrc
+echo "Running drosera dryrun..."
+drosera dryrun || { echo "Warning: Failed to run drosera dryrun, continuing..."; true; }
+sleep 3
+source /root/.bashrc
+cd ~
+cd ~/Drosera-Network || { echo "Error: Cannot change to ~/Drosera-Network directory."; exit 1; }
+echo "Restarting node with docker compose..."
+docker compose up -d || { echo "Warning: Failed to restart node with docker compose, continuing..."; true; }
+sleep 3
+source /root/.bashrc
+echo "Node restarted and dryrun completed."
+
+echo "Drosera Network Testnet Setup Complete for Two Operators!"
+echo "Check the Drosera dashboard at https://app.drosera.io/ for green blocks indicating node liveness."
+echo "Follow me on Twitter for more: https://x.com/0xCrypton_"
