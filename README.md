@@ -83,6 +83,20 @@ or
      cd Drosera-Network
      docker compose up -d
      ```
+## Configuration Edit Commands
+
+Edit .env file:
+ ```
+cd Drosera-Network
+nano .env
+ ```
+Edit docker-compose.yaml
+Edit .env file:
+ ```
+cd Drosera-Network
+nano docker-compose.yaml
+ ```
+
 
 
 
