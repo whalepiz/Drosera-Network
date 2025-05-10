@@ -95,8 +95,7 @@ Edit .env file:
 cd Drosera-Network
 nano .env
  ```
-Edit docker-compose.yaml
-Edit .env file:
+Edit docker-compose.yaml:
  ```
 cd Drosera-Network
 nano docker-compose.yaml
