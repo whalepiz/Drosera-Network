@@ -12,25 +12,12 @@ In this Guide, we contribute to Drosera testnet by:
 * Get started with a low-budget `VPS` for as low as $5! [Purchase here](https://xorek.cloud/?from=27450)
 ![image](https://github.com/user-attachments/assets/691efaf0-c589-45df-b2c0-62578e908a56)
 
-After purchasing, access the panel to change the VPS login password
-![image](https://github.com/user-attachments/assets/f691baf1-49e5-4246-a5f0-5729c2eef541)
-Select "Change password" to change the password
-![image](https://github.com/user-attachments/assets/faf2aacf-3562-446d-a075-61259a015fe5)
-
 ## Facet Ethereum Holesky 
 
 Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/))
 
 ## Ethereum Holesky RPC URL:
 * Create your own `Ethereum Holesky RPC` in [Alchemy](https://dashboard.alchemy.com/).
-## PuTTY
-
-* You can use PuTTY to log in to the VPS.
-  
-![image](https://github.com/user-attachments/assets/869a8124-b57d-4768-bc81-67dc44d6a8d9)
-
-## GitHub Account:
-*Provide your GitHub email and username for configuring Git during the setup
 
 ## Installation
 ◾ Clone the Repository
