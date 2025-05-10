@@ -38,10 +38,6 @@ Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/))
 git clone https://github.com/whalepiz/Drosera-Network/
 cd Drosera-Network && chmod +x s.sh && ./s.sh
 ```
-## Provide Information:
-Here's the translation of the text into English:
-
----
 
 ### **Important Note: Ethereum Holesky Faucet**
 
