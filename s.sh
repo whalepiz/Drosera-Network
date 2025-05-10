@@ -39,28 +39,37 @@ if ! command -v figlet &> /dev/null; then
 fi
 source /root/.bashrc
 
-# Clear terminal
+ Clear terminal
 clear
 
 # Display Crypton header
 figlet -f big "Crypton"
 
-# Info line with color (optional, if terminal supports ANSI colors)
-echo -e "\e[36m=============================================================\e[0m"
-echo -e "Follow me on Twitter for updates and more: \e[4;34mhttps://x.com/0xCrypton_\e[0m"
-echo -e "\e[36m=============================================================\e[0m"
+# Decorative border
+echo -e "\e[36m╔═══════════════════════════════════════════════════════════════╗\e[0m"
+echo -e "║  Follow me on Twitter for updates: \e[4;34mhttps://x.com/0xCrypton_\e[0m   ║"
+echo -e "\e[36m╚═══════════════════════════════════════════════════════════════╝\e[0m"
 echo ""
 
-# Welcome message
-echo -e "\e[1m🚀 Starting Drosera Network Testnet Setup for Two Operators\e[0m"
-echo "💡 Make sure both Holesky ETH wallets are funded before proceeding."
+# Welcome message with icons
+echo -e "\e[1m🚀 Drosera Network Testnet Setup (2 Operators)\e[0m"
+echo -e "💡 Make sure both Holesky ETH wallets are funded."
 echo ""
 
-# Prompt for required inputs
-read -p "🔐 Enter your first EVM wallet public address (Operator 1) " OPERATOR1_PRIVATE_KEY
-read -p "🏷️ Enter your first EVM wallet public address (Operator 1): " OPERATOR1_ADDRESS
-read -p "🔐Enter your second EVM wallet private key (Operator 2): " OPERATOR2_PRIVATE_KEY
-read -p "🏷️ Enter your second EVM wallet public address (Operator 2): " OPERATOR2_ADDRESS
+# Input for Operator 1
+echo -e "\e[35m📘 Operator 1:\e[0m"
+read -p "🔐 Private Key: " OPERATOR1_PRIVATE_KEY
+read -p "🏷️  Public Address: " OPERATOR1_ADDRESS
+echo ""
+
+# Input for Operator 2
+echo -e "\e[35m📙 Operator 2:\e[0m"
+read -p "🔐 Private Key: " OPERATOR2_PRIVATE_KEY
+read -p "🏷️  Public Address: " OPERATOR2_ADDRESS
+echo ""
+
+# Completion message
+echo -e "\e[32m✅ All inputs received. Proceeding with node setup...\e[0m"
 # Auto-detect VPS public IP
 echo "Detecting VPS public IP..."
 VPS_IP=$(curl -s ifconfig.me || curl -s icanhazip.com)
