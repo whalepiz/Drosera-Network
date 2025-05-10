@@ -47,7 +47,7 @@ figlet -f big "Crypton"
 
 # Decorative border
 echo -e "\e[36m╔═══════════════════════════════════════════════════════════════╗\e[0m"
-echo -e "║  Follow me on Twitter for updates: \e[4;34mhttps://x.com/0xCrypton_\e[0m   ║"
+echo -e "║  Join our Telegram for updates: \e[4;34mhttps://t.me/Nexgenexplore\e[0m   ║"
 echo -e "\e[36m╚═══════════════════════════════════════════════════════════════╝\e[0m"
 echo ""
 
