@@ -60,11 +60,11 @@ Before starting, you need to **Faucet Ethereum Holesky** into the wallet address
 
 Make sure to enter all the above information correctly for the script to function properly.
 
-## 🏁 Final Steps
+## Last Steps
 
 1. **Monitor Node Status**:
-   - After the script completes, visit the Drosera dashboard at [https://app.drosera.io/](https://app.drosera.io/) to check for green blocks indicating node liveness.
-   - You can also view Docker logs to monitor the nodes:
+   Once the script finishes, head over to the [https://app.drosera.io/](https://app.drosera.io/) to check for green blocks, which indicate that your node is live and functioning properly.
+   You can also monitor the node’s activity through Docker logs:
 
      ```bash
      cd ~/Drosera-Network
@@ -77,12 +77,12 @@ or
      docker logs drosera-node2
    ```
 
-   - Check That you Have Green Block Log on your Dashboard ( Wait For At Least 1 Hour To Check )
+ Make sure to check for green block logs on your dashboard. (Wait for at least 1 hour to ensure the data updates correctly.)
 
-![Screenshot 2025-04-26 105901](https://github.com/user-attachments/assets/6ec00420-7e4c-49c9-a64a-0efc2dfccb2c)
+![image](https://github.com/user-attachments/assets/55cedbb3-59b5-402f-859c-84cf4f3cc467)
 
-2. **Optional Command (Restart and Dryrun Node)**:
-   - To fetch blocks again and restart the node, run:
+
+2. **Optional Command (Restart and Dryrun Node):**:
      ```bash
      pkill -f drosera-operator
      cd ~
@@ -94,13 +94,7 @@ or
      docker compose up -d
      ```
 
-3. **Stay Updated**:
-   - Follow [Drosera](https://x.com/DroseraNetwork) on Twitter for the latest news and updates about Drosera .
 
-4. **Get Support**:
-   - If you have questions or need help, reach out via [Twitter](https://x.com/0xCrypton_) or the Drosera community.
-
-🚀 **Done!** Your Drosera node should now be running smoothly.
 
 
 
