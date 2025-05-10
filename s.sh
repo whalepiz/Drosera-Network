@@ -57,13 +57,13 @@ echo -e " Make sure both Holesky ETH wallets are funded."
 echo ""
 
 # Input for Operator 1
-echo -e "\e[35m Operator 1:\e[0m"
+echo -e "\e[35mOPERATOR 1:\e[0m"
 read -p "Enter your first EVM wallet private key (Operator 1): " OPERATOR1_PRIVATE_KEY
 read -p "Enter your first EVM wallet public address (Operator 1): " OPERATOR1_ADDRESS
 echo ""
 
 # Input for Operator 2
-echo -e "\e[35m Operator 2:\e[0m"
+echo -e "\e[35mOPERATOR 2:\e[0m"
 read -p "Enter your first EVM wallet private key (Operator 2): " OPERATOR2_PRIVATE_KEY
 read -p "Enter your first EVM wallet public address (Operator 2): " OPERATOR2_ADDRESS
 echo ""
