@@ -42,7 +42,7 @@ source /root/.bashrc
  Clear terminal
 clear
 
-# Display Crypton header
+# Display 
 figlet -f big "Piz - Node"
 
 # Decorative border
@@ -595,4 +595,4 @@ echo "Node restarted and dryrun completed."
 
 echo "Drosera Network Testnet Setup Complete for Two Operators!"
 echo "Check the Drosera dashboard at https://app.drosera.io/ for green blocks indicating node liveness."
-echo "Follow me on Twitter for more: https://x.com/0xCrypton_"
+echo "Follow me on Twitter for more: https://x.com/WhalePiz"
