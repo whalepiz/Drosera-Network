@@ -43,7 +43,7 @@ source /root/.bashrc
 clear
 
 # Display Crypton header
-figlet -f big "Crypton"
+figlet -f big "Crypton" | lolcat
 
 # Decorative border
 echo -e "\e[36m╔═══════════════════════════════════════════════════════════════╗\e[0m"
