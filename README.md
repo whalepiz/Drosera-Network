@@ -84,7 +84,12 @@ or
      docker compose up -d
      ```
 ## Configuration Edit Commands
-
+ 
+ Edit .toml file:
+ ```
+cd my-drosera-trap
+nano drosera.toml
+ ```
 Edit .env file:
  ```
 cd Drosera-Network
@@ -96,6 +101,7 @@ Edit .env file:
 cd Drosera-Network
 nano docker-compose.yaml
  ```
+
 
 
 
