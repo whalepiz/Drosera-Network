@@ -52,24 +52,24 @@ echo -e "\e[36m╚════════════════════�
 echo ""
 
 # Welcome message with icons
-echo -e "\e[1m🚀 Drosera Network Testnet Setup (2 Operators)\e[0m"
-echo -e "💡 Make sure both Holesky ETH wallets are funded."
+echo -e "\e[1m Drosera Network Testnet Setup (2 Operators)\e[0m"
+echo -e " Make sure both Holesky ETH wallets are funded."
 echo ""
 
 # Input for Operator 1
-echo -e "\e[35m📘 Operator 1:\e[0m"
-read -p "🔐 Private Key: " OPERATOR1_PRIVATE_KEY
-read -p "🏷️  Public Address: " OPERATOR1_ADDRESS
+echo -e "\e[35m Operator 1:\e[0m"
+read -p "Enter your first EVM wallet private key (Operator 1): " OPERATOR1_PRIVATE_KEY
+read -p "Enter your first EVM wallet public address (Operator 1): " OPERATOR1_ADDRESS
 echo ""
 
 # Input for Operator 2
-echo -e "\e[35m📙 Operator 2:\e[0m"
-read -p "🔐 Private Key: " OPERATOR2_PRIVATE_KEY
-read -p "🏷️  Public Address: " OPERATOR2_ADDRESS
+echo -e "\e[35m Operator 2:\e[0m"
+read -p "Enter your first EVM wallet private key (Operator 2): " OPERATOR2_PRIVATE_KEY
+read -p "Enter your first EVM wallet public address (Operator 2): " OPERATOR2_ADDRESS
 echo ""
 
 # Completion message
-echo -e "\e[32m✅ All inputs received. Proceeding with node setup...\e[0m"
+echo -e "\e[32m All inputs received. Proceeding with node setup...\e[0m"
 # Auto-detect VPS public IP
 echo "Detecting VPS public IP..."
 VPS_IP=$(curl -s ifconfig.me || curl -s icanhazip.com)
