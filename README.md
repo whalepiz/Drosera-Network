@@ -79,11 +79,14 @@ or
 
  Make sure to check for green block logs on your dashboard. (Wait for at least 1 hour to ensure the data updates correctly.)
 
-![image](https://github.com/user-attachments/assets/55cedbb3-59b5-402f-859c-84cf4f3cc467)
+![image](https://github.com/user-attachments/assets/d2d89770-25fb-4ed8-a49c-4d339cd740fe)
+
 
 
 2. **Optional Command (Restart and Dryrun Node):**:
      ```bash
+     cd ~/Drosera-Network
+     docker compose down -v
      pkill -f drosera-operator
      cd ~
      cd my-drosera-trap
