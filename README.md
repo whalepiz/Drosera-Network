@@ -36,7 +36,7 @@ Facet : [Holesky Faucet](https://holesky-faucet.pk910.de/))
 ◾ Clone the Repository
 ```
 git clone https://github.com/whalepiz/Drosera-Network/
-cd Drosera-Network && chmod +x pc.sh && ./pc.sh
+cd Drosera-Network && chmod +x s.sh && ./s.sh
 ```
 ## Provide Information:
 *The script will prompt you to enter the following details accurately:
