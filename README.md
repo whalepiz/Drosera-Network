@@ -39,45 +39,30 @@ git clone https://github.com/whalepiz/Drosera-Network/
 cd Drosera-Network && chmod +x s.sh && ./s.sh
 ```
 ## Provide Information:
-*The script will prompt you to enter the following details accurately:
+Here's the translation of the text into English:
 
-🔸 Private Key: 
+---
 
-🔸 Public Address: 
+### **Important Note: Ethereum Holesky Faucet**
 
-🔸 Ethereum Holesky RPC URL: 
-* Your RPC URL from Alchemy, QuickNode, or a public node. Press Enter to use the default (https://ethereum-holesky-rpc.publicnode.com).
-* Example: https://eth-holesky.alchemyapi.io/v2/your-api-key
-  
-🔸 GitHub Email:
+Before starting, you need to **Faucet Ethereum Holesky** into the wallet addresses of both Operator 1 and Operator 2. Visit the **Holesky Faucet** page to request test ETH for both wallets. Ensure that you have enough ETH in these wallets before proceeding with the setup.
 
-🔸 GitHub Username: 
+---
 
-## Check Node Liveness
+### **Summary of User Input Requirements:**
 
-🔸 Once the script execution is complete, navigate to the Drosera Dashboard at https://app.drosera.io/ to verify node activity. Look for green blocks, which indicate that your nodes are live and operational.
+1. **Private Key of Operator 1**
+2. **Public Address of Operator 1**
+3. **Private Key of Operator 2**
+4. **Public Address of Operator 2**
+5. **VPS Public IP** (can be auto-detected or manually entered)
+6. **Ethereum Holesky RPC URL** (optional)
+7. **GitHub Email**
+8. **GitHub Username**
 
-🔸 To monitor node performance in real-time, you can inspect the Docker logs using the following command:
+---
 
-```
-cd ~/Drosera-Network
-docker logs -f drosera-node
-```
-🔸 Check That you Have Green Block Log on your Dashboard ( Wait For At Least 1 Hour To Check )
-
-![image](https://github.com/user-attachments/assets/0d1b0211-f970-45b2-9be2-3c4db6554d7c)
-
-## Optional Command  [if required ]
-```
-pkill -f drosera-operator
-cd ~
-cd my-drosera-trap
-source /root/.bashrc
-drosera dryrun
-cd ~
-cd Drosera-Network
-docker compose up -d
-```
+Make sure to enter all the above information correctly for the script to function properly.
 
 
 
